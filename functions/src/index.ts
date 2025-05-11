@@ -7,6 +7,12 @@
  * See a full list of supported triggers at https://firebase.google.com/docs/functions
  */
 
+import { setGlobalOptions } from "firebase-functions";
+
+setGlobalOptions({
+    region: "asia-northeast1"
+})
+
 import {onRequest} from "firebase-functions/v2/https";
 import * as logger from "firebase-functions/logger";
 

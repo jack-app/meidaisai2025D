@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "metype-ffe25"
-  }
+    "default": "metype-ffe25",
+    "metype": "metype-ffe25"
+  },
+  "targets": {},
+  "etags": {}
 }
