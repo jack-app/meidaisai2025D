@@ -1,0 +1,15 @@
+{
+  "name": "meidaisai2025d",
+  "version": "1.0.0",
+  "description": "2025年のアイデアソンででたアイディア: タイピングゲームを作るタイピングゲームを作ります．",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.nagoyayuu:jack-app/meidaisai2025D.git"
+  },
+  "author": "",
+  "license": "ISC"
+}
