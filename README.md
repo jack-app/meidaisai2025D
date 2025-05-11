@@ -19,10 +19,40 @@
 
 # テスト方法
 
-デプロイ(後述)せずに，自分のプログラムの動作確認をしたい場合，`firebase serve`を実行してください．
+デプロイ(後述)せずに，自分のプログラムの動作確認をしたい場合，次の手順に従ってください．
+
+1. カレントディレクトリの変更
+`meidaisai2025D/functions`にカレントディレクトリを移動してください．
+例えば，以下のようにします．
+```
+cd functions
+```
+
+2. ソースコードのクロスコンパイル
+
+以下のコマンドを実行してください．
+```
+npm run build:watch
+```
+これによって，TSのソースコードに変更があれば自動でクロスコンパイルが走るようになります．
+次のステップでこのウィンドウを閉じないように注意してください．（閉じても特段問題は起きませんが，ホットリロードは効かなくなります．）
+
+3. ローカルサーバの起動
+
+別のターミナルを開いて，以下のコマンドを実行してください．
+```
+firebase emulators:start
+```
 しばらく待つと`functions[asia-northeast1-appFunction]: http function initialized (...)`と表示されます．
 ここに，" http://localhost:[ポート番号]/metype-ffe25/asia-northeast1/appFunction "のようなURLが表示されます．
+
 このURLをブラウザのアドレスバーに貼り付け (もしくはCTRLを押しながらURLをクリック) で" https://metype-ffe25.web.app/ "に対応するページが表示されます．
+
+ブラウザにキャッシュが残っていて**変更内容が反映されない**ことが往々にしてあります．
+その場合，キャッシュクリアを行ってください．
+Chromeの場合はキャッシュクリアしたいページを開きながら"Shift+F5"でできます．
+
+参考: https://zenn.dev/nananaoto/articles/9bff8b9eca891656c110
 
 # デプロイ手順
 
@@ -48,9 +78,74 @@ Chromeの場合はキャッシュクリアしたいページを開きながら"S
 
 # コーディングのヒント
 
-後で追記します．
+## 動的コンテンツと静的コンテンツ
+
+リクエストによって内容が変わるコンテンツ（リクエストごとに生成するコンテンツ）を**動的コンテンツ**といいます．
+一方，どんなリクエストに対しても同じコンテンツ（すでにあるコンテンツ）を**静的コンテンツ**といいます．
+
+動的コンテンツとしては，例えば
+
+- REST API
+- ユーザー名によって表示の変わるページ
+
+があります．
+
+静的コンテンツとしては，例えば
+
+- CSS
+- クライアントサイドのスクリプト
+
+があります．
+
+## ルーティングの変更
+
+動的コンテンツのルーティング: `functions/src/index.ts`を編集します．
+静的コンテンツのルーティング: `public`内のディレクトリ構成を変更します．
+
+仮に静的コンテンツと動的コンテンツで重複するエンドポイントがあった場合，静的コンテンツのほうが優先されるので注意してください．
+
+# バックエンド (functions) の開発におけるヒント
+
+## （RESTful APIの）インタラクティブなテスト
+
+[shellモードを用いる](https://firebase.google.com/docs/functions/local-shell?hl=ja)
+
+## テストの配置
+
+- 特定のソースファイル`xxx.ts`に関連の深いテストであれば，同階層に`xxx.test.ts`としてテストを配置してください．
+- 複数のソースファイルに関連するテストであれば，functions/test内に`yyy.test.ts`としてテストを配置してください．
+
+ファイル名の末尾は必ず`.test.ts`である必要があります．
+
+## 全テストを実行したいとき
+
+(カレントディレクトリを`functions`にして)
+
+`npm test` or `npx vitest`
+
+## 特定のディレクトリ内のテストを実行したいとき
+
+(カレントディレクトリを`functions`にして)
+
+`npm test <ここにディレクトリのパス>` or `npx vitest <ここにディレクトリのパス>`
+
+例えば，functions/src/views内のテストのみ実行したい場合は`npm test views`とします．
+詳細は`npx vitest --help`で確認することもできます．
+
+## コードをローカルから直接実行する
+
+(カレントディレクトリを`functions`にして)
+
+`npx tsx path/to/script`
+
+例えば，`functions/test/sample.script.ts`をローカルから直接実行する場合，
+`npx tsx test/sample.script.ts`
+
+テストとしての体裁を整えるほどではないが`console.log`でデバッグをしたい場合につかえるかも．
 
 # 参考
 
 - https://www.youtube.com/watch?v=LOeioOKUKI8
 - https://firebase.google.com/docs/firestore/security/rules-conditions?hl=ja
+- https://firebase.google.com/docs/functions
+- https://firebase.google.com/docs/functions/typescript
