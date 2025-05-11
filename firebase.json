@@ -8,12 +8,8 @@
     ],
     "rewrites": [
       {
-        "source": "/",
-        "destination": "/index.html"
-      },
-      {
-        "source": "/helloWorld",
-        "function": "helloWorld"
+        "source": "**",
+        "function": "appFunction"
       }
     ]
   },
