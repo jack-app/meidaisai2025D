@@ -21,8 +21,8 @@
 
 デプロイ(後述)せずに，自分のプログラムの動作確認をしたい場合，`firebase serve`を実行してください．
 しばらく待つと`functions[asia-northeast1-appFunction]: http function initialized (...)`と表示されます．
-ここに，"http://localhost:[ポート番号]/metype-ffe25/asia-northeast1/appFunction"のようなURLが表示されます．
-このURLをブラウザのアドレスバーに貼り付け (もしくはCTRLを押しながらURLをクリック) で"https://metype-ffe25.web.app/"に対応するページが表示されます．
+ここに，" http://localhost:[ポート番号]/metype-ffe25/asia-northeast1/appFunction "のようなURLが表示されます．
+このURLをブラウザのアドレスバーに貼り付け (もしくはCTRLを押しながらURLをクリック) で" https://metype-ffe25.web.app/ "に対応するページが表示されます．
 
 # デプロイ手順
 
@@ -39,7 +39,7 @@
 1. firebaseにログインする．`firebase login`
 2. デプロイする`firebase deploy`
 
-デプロイが済んだら，"https://metype-ffe25.web.app/"に反映されます．
+デプロイが済んだら，" https://metype-ffe25.web.app/ "に反映されます．
 ブラウザにキャッシュが残っていて**変更内容が反映されない**ことが往々にしてあります．
 その場合，キャッシュクリアを行ってください．
 Chromeの場合はキャッシュクリアしたいページを開きながら"Shift+F5"でできます．
