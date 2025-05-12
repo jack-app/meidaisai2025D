@@ -112,36 +112,25 @@ Chromeの場合はキャッシュクリアしたいページを開きながら"S
 
 ## テストの配置
 
-- 特定のソースファイル`xxx.ts`に関連の深いテストであれば，同階層に`xxx.test.ts`としてテストを配置してください．
-- 複数のソースファイルに関連するテストであれば，functions/test内に`yyy.test.ts`としてテストを配置してください．
-
+`xxx.test.ts`としてテストを配置してください．
 ファイル名の末尾は必ず`.test.ts`である必要があります．
 
 ## 全テストを実行したいとき
 
 (カレントディレクトリを`functions`にして)
-
-`npm test` or `npx vitest`
+`npm test`
 
 ## 特定のディレクトリ内のテストを実行したいとき
 
 (カレントディレクトリを`functions`にして)
-
-`npm test <ここにディレクトリのパス>` or `npx vitest <ここにディレクトリのパス>`
+`npm test <ここにディレクトリのパス>`
 
 例えば，functions/src/views内のテストのみ実行したい場合は`npm test views`とします．
 詳細は`npx vitest --help`で確認することもできます．
 
-## コードをローカルから直接実行する
+## クライアント（フロントエンド）としてテストしたいとき
 
-(カレントディレクトリを`functions`にして)
-
-`npx tsx path/to/script`
-
-例えば，`functions/test/sample.script.ts`をローカルから直接実行する場合，
-`npx tsx test/sample.script.ts`
-
-テストとしての体裁を整えるほどではないが`console.log`でデバッグをしたい場合につかえるかも．
+`test-client`パッケージを編集してください．
 
 # 参考
 

@@ -1,3 +1,9 @@
+// firebaseの初期化
+import { initializeApp } from "firebase-admin/app";
+initializeApp({
+  projectId: "metype-ffe25"
+});
+
 // ルータとしてexpressを使用
 // ルータ: URL（エンドポイント）に基づいて返すレスポンスを決定するもの．
 import express from "express";
