@@ -189,3 +189,4 @@ Chromeの場合はキャッシュクリアしたいページを開きながら"S
 - https://firebase.google.com/docs/firestore/security/rules-conditions?hl=ja
 - https://firebase.google.com/docs/functions
 - https://firebase.google.com/docs/functions/typescript
+- https://zenn.dev/nyoroko/articles/f03f4dfa375e05
