@@ -3,6 +3,9 @@
 
 # 開発環境の用意
 
+すべての手順を位置から順番に実行しなければならないわけではありません．たとえば，すでにリポジトリをクローンしてある場合は新たにクローンする必要はありません．
+かわりに，`git pull origin main`を実行してローカルリポジトリ（手元の作業環境）を最新の状態に更新してください．
+
 ## リポジトリの用意
 
 1. `git`をインストールする．(詳細略)
@@ -37,8 +40,8 @@
 
 ## Javaのインストール
 
-firebase-toolsを動作させるためにJDK(ver11以上)が必要なため，インストールする．
-どのようにインストールしてもよいが，たとえば[この記事](https://codeforfun.jp/how-to-install-java-jdk-on-windows-and-mac/)を参考にする．
+firebase-toolsを動作させるためにJDK(ver11以上)が必要なため，インストールします．
+どのようにインストールしてもよいが，たとえば[この記事](https://codeforfun.jp/how-to-install-java-jdk-on-windows-and-mac/)を参考にしてください．
 
 ## firebase-toolsの用意
 
