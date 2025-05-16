@@ -1,4 +1,6 @@
 .firebase
 *.log
 /public
+/.favorites.json
+/.vscode
 node_modules
