@@ -1,5 +1,4 @@
 .firebase
-firebase-debug.log
-firestore-debug.log
+*.log
+/public
 node_modules
-public

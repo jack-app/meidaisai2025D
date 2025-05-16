@@ -91,15 +91,30 @@ firebase-toolsを動作させるためにJDK(ver11以上)が必要なため，�
 
 実際のデプロイ手順は次の通りです．
 
-1. [バックエンドをビルドする．](functions/README.md)
-2. [フロントエンドをビルドする．](frontend/README.md)
-3. firebaseにログインする．`firebase login`
-4. デプロイする`firebase deploy`
+1. firebaseにログインする．`firebase login`
+2. バックエンドの依存パッケージを最新にする．`cd functions && npm install`
+3. バックエンドをビルドする．`npm run build && cd ..`
+4. フロントエンドの依存パッケージを最新にする．`cd frontend && npm install`
+5. フロントエンドをビルドする．`npm run build && cd ..`
+6. デプロイする`firebase deploy`
+
+手順2以降は`deploy.sh`にスクリプトとしてまとめてあります．
 
 デプロイが済んだら，" https://metype-ffe25.web.app/ "に変更が反映されます．
 ブラウザにキャッシュが残っていて**変更内容が反映されない**ことが往々にしてあります．
 その場合，キャッシュクリアを行ってください．
 Chromeの場合はキャッシュクリアしたいページを開きながら"Shift+F5"でできます．
+
+# 開発環境の立ち上げ
+
+以下の手順を必要に応じて実行します．
+
+1. リポジトリを最新にする．`git pull origin main`
+2. フロントエンドの自動ビルドを有効化する. `cd frontend && npm run build:watch`
+3. バックエンドの自動ビルドを有効化する． `cd functions && npm run build:watch`
+4. firebaseのエミュレータを起動する． `firebase emulators:start`
+
+手順2から4は`launch_local_server.sh`にスクリプトとしてまとめてあります．
 
 # 参考
 
