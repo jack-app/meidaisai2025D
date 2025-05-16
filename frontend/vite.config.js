@@ -6,6 +6,7 @@ export default defineConfig({
       // https://rollupjs.org/configuration-options/#watch
       include: ['src/**/*'],
     },
-    emptyOutDir: '../public',
+    outDir: '../public',
+    emptyOutDir: true,
   },
 })
