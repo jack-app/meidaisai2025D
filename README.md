@@ -35,7 +35,12 @@
 - meidaisai2025DフォルダでVSCodeを開いて統合ターミナルを開くとすでにプロジェクトルートにいる状態からスタートします．
 - ファイルエクスプローラでmeidaisai2025Dフォルダをひらいて，”ここで端末を開く”をクリックしてもプロジェクトルートに居る状態でターミナルが起動します．
 
-## firebase-toolの用意
+## Javaのインストール
+
+firebase-toolsを動作させるためにJDK(ver11以上)が必要なため，インストールする．
+どのようにインストールしてもよいが，たとえば[この記事](https://codeforfun.jp/how-to-install-java-jdk-on-windows-and-mac/)を参考にする．
+
+## firebase-toolsの用意
 
 1. `npm`をインストールする(すでにインストールしてある場合は不要)．`node.js`をインストールすれば自動でインストールされる．[ここからインストール可能です．](https://nodejs.org/ja)
 2. ターミナルをひらいて，`npm i -g firebase-tools`で`firebase`コマンドをインストールする．
@@ -46,17 +51,18 @@
 4. カレントディレクトリをfunctionsにする. `cd functions`
 5. TS->JS．`npm run build`
 6. プロジェクトルートに戻る．`cd ..`
-7. firebaseのエミュレータを起動する．`firebase emulators:start`
-8. "Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files."と表示されるまで待つ．
-9. 別のターミナルを開いて，プロジェクトルートに移動する
-10. test-clientをカレントディレクトリにする．`cd test-client`
-11. `npm test`を実行する．
-12.  "PASS"と表示されることを確認する．（エミュレータが正しく動作していない場合，"FAIL  Tests failed."と言われます．）
+7. firebaseにログインする．`firebase login`
+8. firebaseのエミュレータを起動する．`firebase emulators:start`
+9. "Issues? Report them at https://github.com/firebase/firebase-tools/issues and attach the *-debug.log files."と表示されるまで待つ．
+10. 別のターミナルを開いて，プロジェクトルートに移動する
+11. test-clientをカレントディレクトリにする．`cd test-client`
+12. `npm test`を実行する．
+13.  "PASS"と表示されることを確認する．（エミュレータが正しく動作していない場合，"FAIL  Tests failed."と言われます．）
 
 以下は起動したテストやエミュレータを終了する手順です
 
-13. テストの終了: テストを実行したターミナルを開きながら_Q_をおす
-14. エミュレータの終了: エミュレータを起動したターミナルを開きながら_Ctrl+C_(Macの場合はわからないです．すみません．)
+14. テストの終了: テストを実行したターミナルを開きながら_Q_をおす
+15. エミュレータの終了: エミュレータを起動したターミナルを開きながら_Ctrl+C_(Macの場合はわからないです．すみません．)
 
 # テスト方法
 
