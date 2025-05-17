@@ -3,6 +3,9 @@
 
 - public/: ビルド時にそのまま出力されるファイル群です．ここにアセットを**配置します**．
 - src/: フロントエンドの開発では、このディレクトリを**編集します**．
+  - components/: viewの生成に用いられるコンポーネント (SolidJS) を配置します．viewのうち汎用的な要素はここに置くものと考えて差し支えありません．
+  - scenes/: シーンを配置します．詳しくは[開発手順,シーンの追加](#シーンの追加)を参照してください．
+  - data_interface/: 
 - node_modules/: 依存ライブラリが格納されます．`npm install`で作成されます．直接編集することはありません．
 - package.json: プロジェクトの設定ファイルです．通常編集しません．
 - package-lock.json: npmによって自動で生成されるファイルです．直接編集することはありません．
@@ -51,9 +54,20 @@ export default SceneSig;
 
 ### 3. 画面遷移の実現
 
-画面遷移をするときは，`SceneBase`を継承したクラス（各シーン）の中で，
-`this.manager.changeSceneTo(SceneSig.遷移したいシーン);`
-を実行する．
+
+画面遷移をするときは，`SceneBase`を継承したクラスの`manager`から`changeSceneTo`を呼び出す．
+
+```ts
+class XxxScene extends SceneBase {
+    ...
+    someMethod() {
+        ...
+        this.manager.changeSceneTo(SceneSig.遷移したいシーン);
+        ...
+    }
+}
+```
+
 
 この際，自分自身に遷移させても，自分以外に遷移しても構わない．
 

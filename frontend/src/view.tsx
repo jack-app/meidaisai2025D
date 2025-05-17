@@ -7,9 +7,7 @@ import type SceneBase from './scenes/fundation/sceneBase'
 import LoadingScene from './scenes/loading'
 import instanciateAllScenes from './scenes/fundation/instanciate'
 
-import './config'
-
-function App() {
+function ViewRoot() {
   // 全シーンで共通のSceneManagerを作成する
   const sceneManager = new SceneManager();
 
@@ -32,4 +30,4 @@ function App() {
   )
 }
 
-export default App
+export default ViewRoot

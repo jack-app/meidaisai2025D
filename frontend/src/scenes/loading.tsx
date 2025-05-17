@@ -1,7 +1,7 @@
 import type { JSXElement } from "solid-js";
 import SceneBase from "./fundation/sceneBase"; 
 import type SceneManager from "./fundation/sceneManager";
-import Align from "../components/Align";
+import Align from "../components/align";
 import SceneSig from "./fundation/signatures";
 
 export default class LoadingScene extends SceneBase {

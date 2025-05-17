@@ -1,8 +1,10 @@
 /* @refresh reload */
 import { render } from 'solid-js/web'
 import './index.css'
-import App from './App.tsx'
+import ViewRoot from './view.tsx'
+
+import './const.ts'
 
 // solid bootstrap
 const root = document.getElementById('root')
-render(() => <App />, root!)
+render(() => <ViewRoot />, root!)

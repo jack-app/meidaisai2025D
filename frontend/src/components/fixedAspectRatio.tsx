@@ -1,5 +1,5 @@
 import { createSignal, onMount, type JSX } from 'solid-js';
-import Align from './Align';
+import Align from './align';
 
 type FixedAspectRatioProps = {
     children: JSX.Element,
