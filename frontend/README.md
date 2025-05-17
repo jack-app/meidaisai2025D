@@ -1,28 +1,44 @@
-## Usage
 
-```bash
-$ npm install # or pnpm install or yarn install
-```
+# ディレクトリ構成
 
-### Learn more on the [Solid Website](https://solidjs.com) and come chat with us on our [Discord](https://discord.com/invite/solidjs)
+- public/: ビルド時にそのまま出力されるファイル群です．ここにアセットを**配置します**．
+- src/: フロントエンドの開発では、このディレクトリを**編集します**．
+- node_modules/: 依存ライブラリが格納されます．`npm install`で作成されます．直接編集することはありません．
+- package.json: プロジェクトの設定ファイルです．通常編集しません．
+- package-lock.json: npmによって自動で生成されるファイルです．直接編集することはありません．
+- tsconfig.json, tsconfig.app.json, tsconfig.node.json: TypeScriptの設定ファイルです．普通編集しません．
+- vite.config.ts: Viteの設定ファイルです．普通編集しません．
 
-## Available Scripts
+# 開発のヒント
 
-In the project directory, you can run:
+## 自動ビルド
 
-### `npm run dev`
+作成したコードを動作させるために，**ビルド**が必要です．
+(カレントディレクトリを`frontend`にして)
+`npm run build`でビルドできますが，変更のたびにこのコマンドを実行するのは面倒です．
 
-Runs the app in the development mode.<br>
-Open [http://localhost:5173](http://localhost:5173) to view it in the browser.
+そこで，`npm run build:watch`と実行することで，変更を監視し，変更があれば自動でビルドが走るようにできます．
+変更の監視を停止するときは，`npm run build:watch`を実行したターミナルで"Ctrl+C"か，バツボタンでターミナルを閉じます．
 
-### `npm run build`
+## 単体テストの配置
 
-Builds the app for production to the `dist` folder.<br>
-It correctly bundles Solid in production mode and optimizes the build for the best performance.
+`xxx.test.ts`としてテストを配置してください．
+ファイル名の末尾は必ず`.test.ts`である必要があります．
 
-The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!
+## 全テストを実行したいとき
 
-## Deployment
+(カレントディレクトリを`frontend`にして)
+`npm test`
 
-Learn more about deploying your application with the [documentations](https://vite.dev/guide/static-deploy.html)
+## 特定のディレクトリ内のテストを実行したいとき
+
+(カレントディレクトリを`frontend`にして)
+`npm test <ここにディレクトリのパス>`
+
+例えば，functions/src/scenes内のテストのみ実行したい場合は`npm test scenes`とします．
+詳細は`npx vitest --help`で確認することもできます．
+
+## 統合テスト
+
+1. `launch_local_server.sh`を実行してエミュレータを起動します．
+2. " http://127.0.0.1:5000 "にアクセスして動作を確認します．
