@@ -1,34 +1,34 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { createSignal, Show } from 'solid-js'
 import './App.css'
 
-function App() {
-  const [count, setCount] = useState(0)
+import SceneManager from './scenes/sceneManager'
+import type SceneBase from './scenes/sceneBase'
 
+import LoadingScene from './scenes/loading'
+import ExampleScene from './scenes/example'
+import FixedAspectRatio from './components/fixedAspectRatio'
+
+function App() {
+  // 全シーンで共通のSceneManagerを作成する
+  const sceneManager = new SceneManager();
+
+  /********************** 
+   * ここでシーンを追加する * 
+   * ********************/
+  const loadingScene = new LoadingScene(sceneManager)
+  new ExampleScene(sceneManager)
+
+  // シーンマネージャーがシーンを切り替えれるように設定する．
+  const [getScene, setScene] = createSignal<SceneBase|null>(null);
+  sceneManager.bindSceneChangeCallback(setScene);
+
+  // 以下表示する内容
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
+    <FixedAspectRatio width={1600} height={900}>
+      <Show when={getScene()} fallback={loadingScene.makeComponent()}>
+        {getScene()!.makeComponent()}
+      </Show>
+    </FixedAspectRatio>
   )
 }
 
