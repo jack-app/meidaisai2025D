@@ -1,10 +1,11 @@
 import type SceneManager from "./sceneManager";
 import type { JSXElement } from "solid-js";
+import SceneSig from "./signatures";
 
 export default abstract class SceneBase {
     constructor(
         public readonly manager: SceneManager,
-        public readonly name: string, 
+        public readonly sceneSignature: SceneSig, 
         public readonly options: {
             initialScene?: boolean, 
             needsToBeInitialized?: boolean

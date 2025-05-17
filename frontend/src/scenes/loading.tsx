@@ -1,12 +1,12 @@
 import type { JSXElement } from "solid-js";
-import SceneBase from "./sceneBase"; 
-import type SceneManager from "./sceneManager";
+import SceneBase from "./fundation/sceneBase"; 
+import type SceneManager from "./fundation/sceneManager";
 import Align from "../components/Align";
-import scenes from "./sceneNames";
+import SceneSig from "./fundation/signatures";
 
 export default class LoadingScene extends SceneBase {
     constructor(manager: SceneManager) {
-        super(manager, scenes.loading, {initialScene: true});
+        super(manager, SceneSig.loading, {initialScene: true});
     }
 
     makeComponent(): JSXElement {

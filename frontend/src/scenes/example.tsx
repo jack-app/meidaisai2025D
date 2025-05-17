@@ -1,9 +1,9 @@
-import { createSignal, onCleanup, onMount, Show, type JSXElement } from "solid-js";
-import SceneBase from "./sceneBase";
-import type SceneManager from "./sceneManager";
+import { createSignal, onCleanup, onMount, Show, type Accessor, type JSXElement, type Setter } from "solid-js";
+import SceneBase from "./fundation/sceneBase";
+import type SceneManager from "./fundation/sceneManager";
 import { Container, Assets, Sprite, Application as PixiApp, type Texture } from 'pixi.js'
 import Stack from "../components/stack";
-import scenes from "./sceneNames";
+import SceneSig from "./fundation/signatures";
 
 export default class ExampleScene extends SceneBase {
     
@@ -12,20 +12,22 @@ export default class ExampleScene extends SceneBase {
     //
 
     constructor(manager: SceneManager) {
-        super(manager, scenes.example);
+        super(manager, SceneSig.example);
     }
 
     private textureAsset!: Texture;
     private pixiApp!: PixiApp;
     async preload(): Promise<void> {
-        console.log(`Preloading ${this.name}...`);
+        console.log(`Preloading ${this.sceneSignature}...`);
         
         const pixiApp = new PixiApp();
 
         // 各種初期化を並行して行う．
-        [this.textureAsset, ] = await Promise.all([
+        await Promise.all([
             // アセットを用意する
-            Assets.load('https://pixijs.com/assets/bunny.png'),
+            (async () => {
+                this.textureAsset = await Assets.load('https://pixijs.com/assets/bunny.png')
+            })(),
             // 1秒待つ
             new Promise((resolve)=>{setTimeout(resolve, 1000)}),
             // PixiAppの初期化. 
@@ -38,7 +40,7 @@ export default class ExampleScene extends SceneBase {
         this.pixiApp = pixiApp;
         
         // 初期化が終わったら、exampleシーン（このシーン）を表示する
-        this.manager.changeSceneTo(scenes.example);
+        this.manager.changeSceneTo(SceneSig.example);
     }
 
     //
@@ -54,7 +56,6 @@ export default class ExampleScene extends SceneBase {
 
         // キャンバスが表示されたら，その大きさに合わせてキャンバス内のコンテンツを配置する．
         onMount(() => {
-            console.log("MiddleCanvas onMount");
             this.arrangeContent(pixiContainer, canvasHolder);
             // ウィンドウがリサイズされたときは再配置する
             window.addEventListener('resize', () => {
@@ -97,16 +98,10 @@ export default class ExampleScene extends SceneBase {
 
     // PixiAppのコンテンツを配置する
     arrangeContent(contentContainer: Container, canvasHolder: HTMLElement) {
-
-        if (!this.pixiApp) {
-            throw new Error("PixiApp is not initialized");
-        }
-
         this.pixiApp.renderer.resize(
             canvasHolder.clientWidth, 
             canvasHolder.clientHeight
         );
-
 
         const desiredContainerSize = Math.min(
             this.pixiApp.screen.width,
@@ -125,7 +120,7 @@ export default class ExampleScene extends SceneBase {
     //
 
     makeComponent(): JSXElement {
-        const [getAction, setAction] = createSignal<null|string>();
+        const [getAction, setAction] = createSignal<null|string>(null);
         const keyListener = (e: KeyboardEvent) => {
             setAction(`pressed: ${e.key}`);
         }
@@ -146,35 +141,41 @@ export default class ExampleScene extends SceneBase {
 
         return <Stack>
             {/*上の方に書いてある要素から先に描画されるから，一番上の要素が最背面になる．*/}
-            <Stack.Item>
-                <Background/>
-            </Stack.Item>
-            <Stack.Item>
-                {this.MiddleCanvas()}
-            </Stack.Item>
+            <Stack.Item><Background/></Stack.Item>
+            <Stack.Item>{this.MiddleCanvas()}</Stack.Item>
+            
             {/*Stack.Itemは何も指定しなければデフォルトのスタイルが当たるが，指定することも可能*/}
             <Stack.Item style={{left: '10%', top: '10%', width: 'fit-content', height: 'fit-content'}}>
-                <h1>Example Scene</h1>
-                <p>Example scene with Pixi.js</p>
-                <Show when={getAction()}>
-                    <p>{getAction()}</p>
-                </Show>
+                <Label action={getAction}/>
             </Stack.Item>
+
             <Stack.Item style={{right: '10%', bottom: '10%', width: 'fit-content', height: 'fit-content'}}>
-                <button onclick={() => {
-                    setAction("button was clicked");
-                }}>
-                    <h1>Click me!</h1>
-                </button>
+                <Button onclick={setAction} />
             </Stack.Item>
-        </Stack> as HTMLElement;
+        </Stack>
     }
 }
 
 function Background() {
     return <div style={{
-        width: '100%',
-        height: '100%',
-        "background-color": 'blue',
-    }}/>
+            width: '100%',
+            height: '100%',
+            "background-color": 'blue',
+        }}/>
+}
+
+function Label({action}: {action: Accessor<string | null>}) {
+    return <>
+        <h1>Example Scene</h1>
+        <p>Example scene with Pixi.js</p>
+        <Show when={action()}>
+            <p>{action()}</p>
+        </Show>
+    </>
+}
+
+function Button({onclick}: {onclick: Setter<null|string>}) {
+    return <button onclick={() => onclick("button was clicked")}>
+        <h1>Click me!</h1>
+    </button>
 }

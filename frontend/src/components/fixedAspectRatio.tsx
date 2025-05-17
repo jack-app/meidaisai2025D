@@ -7,6 +7,17 @@ type FixedAspectRatioProps = {
     height: number,
 }
 
+/**
+ * 固定アスペクト比のコンテナコンポーネントです。
+ * 
+ * 指定された幅（width）と高さ（height）からアスペクト比を計算し、
+ * 親要素のサイズに応じて子要素のサイズを自動的に調整します。
+ * ウィンドウサイズの変更にも対応し、常に指定したアスペクト比を維持します。
+ * 
+ * @param children - 固定アスペクト比内に表示するReactノード
+ * @param width - 基準となる幅（ピクセル単位）
+ * @param height - 基準となる高さ（ピクセル単位）
+ */
 export default function FixedAspectRatio({children, width, height,}: FixedAspectRatioProps) {
     const ratio = height / width;
 

@@ -1,8 +1,9 @@
 import type SceneBase from "./sceneBase";
+import SceneSig from "./signatures";
 
 export default class SceneManager {
     // シーンの一覧を保管する．
-    private readonly scenes: {[name: string]: SceneBase} = {};
+    private readonly scenes: Map<SceneSig, SceneBase> = new Map();
 
     // シーンの変更を監視するためのコールバック関数を設定する．
     private sceneChangeCallback: ((scene: SceneBase) => void)|null = null;
@@ -18,7 +19,7 @@ export default class SceneManager {
         const previousScene = this.currentScene;
         await scene.load();
         this.currentScene = scene;
-        console.log(`Changing scene to ${scene.name} from ${previousScene?.name}`);
+        console.log(`Scene ${previousScene?.sceneSignature} から Scene ${scene.sceneSignature} に遷移しています`);
         if (this.sceneChangeCallback) {
             this.sceneChangeCallback(scene);
         }
@@ -28,26 +29,27 @@ export default class SceneManager {
 
     /// シーンを追加する．SceneBaseから呼ばれる．
     addScene(scene: SceneBase) {
-        if (this.scenes[scene.name]) {
-            throw new Error(`Scene ${scene.name} はすでに登録されています．`);
+        if (this.scenes.has(scene.sceneSignature)) {
+            throw new Error(`Scene ${scene.sceneSignature.toString()} はすでに登録されています．`);
         }
         if (scene.options.initialScene) {
             if (this.currentScene) {
                 throw new Error(
-`初期シーンはすでに設定されています(${this.currentScene.name}). 
-さらに${scene.name}を初期シーンにすることはできません．`
+`初期シーンはすでに設定されています(Scene ${this.currentScene.sceneSignature.toString()}). 
+さらに Scene ${scene.sceneSignature.toString()}を初期シーンにすることはできません．`
                 );
             }
             this.updateCurrentScene(scene);
         }
-        this.scenes[scene.name] = scene;
+        this.scenes.set(scene.sceneSignature, scene);
+        console.log(`Scene ${scene.sceneSignature.toString()} を追加しました`);
     }
 
-    /// 現在のシーンをシーン名で更新する．
-    changeSceneTo(sceneName: string) {
-        if (!this.scenes[sceneName]) {
-            throw new Error(`Scene ${sceneName} does not exist in ${this.scenes}.`);
+    /// 現在のシーンをシーンシグネチャで更新する．
+    changeSceneTo(sceneSignature: SceneSig) {
+        if (!this.scenes.has(sceneSignature)) {
+            throw new Error(`Scene ${sceneSignature} は ${this.scenes} に存在しません.`);
         }
-        this.updateCurrentScene(this.scenes[sceneName]);
+        this.updateCurrentScene(this.scenes.get(sceneSignature)!);
     }
 }
