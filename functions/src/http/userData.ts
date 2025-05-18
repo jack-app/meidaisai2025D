@@ -10,8 +10,12 @@ import type { Request, Response } from 'express';
 // import { getFirestore } from 'firebase-admin/firestore';
 // const db = getFirestore(app);
 
-function retrieveUserData(req: Request, res: Response) {
+function getUserData(req: Request, res: Response) {
     
 }
 
-export {retrieveUserData}
+function setUserData(req: Request, res: Response) {
+    
+}
+
+export {getUserData, setUserData}

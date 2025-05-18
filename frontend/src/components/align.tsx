@@ -13,15 +13,15 @@ type AlignProps = {
  * @param horizontal 水平方向の揃え位置（'left' | 'center' | 'right'）
  * @param vertical 垂直方向の揃え位置（'top' | 'center' | 'bottom'）
  */
-export default function Align({children, horizontal, vertical,}: AlignProps) {
+export default function Align(prop: AlignProps) {
     return <div
         style={{
             width: '100%',
             height: '100%',
-            "place-content": horizontal,
-            "place-items": vertical,
+            "place-content": prop.horizontal,
+            "place-items": prop.vertical,
         }}
     >
-        {children}
+        {prop.children}
     </div>
 }

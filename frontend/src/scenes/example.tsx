@@ -4,6 +4,7 @@ import type SceneManager from "./fundation/sceneManager";
 import { Container, Assets, Sprite, Application as PixiApp, type Texture } from 'pixi.js'
 import Stack from "../components/stack";
 import SceneSig from "./fundation/signatures";
+import { userDataManager } from "../const";
 
 export default class ExampleScene extends SceneBase {
     
@@ -120,6 +121,7 @@ export default class ExampleScene extends SceneBase {
     //
 
     makeComponent(): JSXElement {
+
         const [getAction, setAction] = createSignal<null|string>(null);
         const keyListener = (e: KeyboardEvent) => {
             setAction(`pressed: ${e.key}`);
@@ -152,6 +154,10 @@ export default class ExampleScene extends SceneBase {
             <Stack.Item style={{right: '10%', bottom: '10%', width: 'fit-content', height: 'fit-content'}}>
                 <Button onclick={setAction} />
             </Stack.Item>
+
+            <Stack.Item style={{left: '10%', bottom: '10%', width: 'fit-content', height: 'fit-content'}}>
+                <LoginIndicator />
+            </Stack.Item>
         </Stack>
     }
 }
@@ -164,18 +170,23 @@ function Background() {
         }}/>
 }
 
-function Label({action}: {action: Accessor<string | null>}) {
+function Label(prop: {action: Accessor<string | null>}) {
     return <>
         <h1>Example Scene</h1>
         <p>Example scene with Pixi.js</p>
-        <Show when={action()}>
-            <p>{action()}</p>
+        <Show when={prop.action()}>
+            <p>{prop.action()}</p>
         </Show>
     </>
 }
 
-function Button({onclick}: {onclick: Setter<null|string>}) {
-    return <button onclick={() => onclick("button was clicked")}>
+function Button(prop: {onclick: Setter<null|string>}) {
+    return <button onclick={() => prop.onclick("button was clicked")}>
         <h1>Click me!</h1>
     </button>
+}
+
+function LoginIndicator() {
+    const state = userDataManager.useUserState();
+    return <h1>{state.isLoggedIn ? "Logged in" : "Not logged in"}</h1>
 }

@@ -18,11 +18,11 @@ type FixedAspectRatioProps = {
  * @param width - 基準となる幅（ピクセル単位）
  * @param height - 基準となる高さ（ピクセル単位）
  */
-export default function FixedAspectRatio({children, width, height,}: FixedAspectRatioProps) {
-    const ratio = height / width;
+export default function FixedAspectRatio(prop: FixedAspectRatioProps) {
+    const ratio = prop.height / prop.width;
 
-    const [getHeight, setHeight] = createSignal(width);
-    const [getWidth, setWidth] = createSignal(height);
+    const [getHeight, setHeight] = createSignal(prop.width);
+    const [getWidth, setWidth] = createSignal(prop.height);
 
     let holder!: HTMLDivElement;
 
@@ -46,7 +46,7 @@ export default function FixedAspectRatio({children, width, height,}: FixedAspect
         }}>
             <Align horizontal="center" vertical="center">
                 <div 
-                    children={children}
+                    children={prop.children}
                     style={{
                         width: `${getWidth()}px`,
                         height: `${getHeight()}px`,

@@ -6,7 +6,7 @@ import { type Express } from 'express';
 
 import { test } from "./test";
 import { signup, login } from "./auth";
-import { retrieveUserData } from "./userData";
+import { getUserData, setUserData } from "./userData";
 
 export default function (app: Express) {
     // 接続テスト用エンドポイント
@@ -19,5 +19,8 @@ export default function (app: Express) {
     app.post("/api/login", login)
 
     // ユーザデータ取得用エンドポイント
-    app.get("/api/user", retrieveUserData)
+    app.get("/api/user", getUserData)
+
+    // ユーザデータ更新用エンドポイント
+    app.post("/api/user", setUserData)
 }

@@ -22,7 +22,7 @@ type StackProps = {
  * 上に記述したStack.Itemほど背面に、下に記述したStack.Itemほど前面に表示されます。
  * つまり、リストの後ろに書いた要素ほど手前に表示されます。
  */
-export default function Stack({children,}: StackProps) {
+export default function Stack(prop: StackProps) {
   return <div 
     style={{
       position: 'relative',
@@ -30,7 +30,7 @@ export default function Stack({children,}: StackProps) {
       height: '100%',
     }}
   >
-    {children}
+    {prop.children}
   </div>
 }
 
@@ -38,11 +38,11 @@ type StackItemProps = {
   children: JSXElement,
   style?: JSX.CSSProperties,
 };
-Stack.Item = function ({children, style}: StackItemProps) {
+Stack.Item = function (prop: StackItemProps) {
   return <div 
     style={{
       position: 'absolute',
-      ...(style ?? {
+      ...(prop.style ?? {
         top: 0,
         left: 0,
         width: '100%',
@@ -50,6 +50,6 @@ Stack.Item = function ({children, style}: StackItemProps) {
       })
     }}
   >
-    {children}
+    {prop.children}
   </div>
 }
