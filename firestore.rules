@@ -2,18 +2,20 @@ rules_version = '2';
 
 service cloud.firestore {
   match /databases/{database}/documents {
+    
+    // https://firebase.google.com/docs/firestore/security/rules-conditions?hl=ja
+    // リクエストしているユーザーのuidがユーザードキュメントの名前と一致していることを確認します。
+    // ワイルドカード式 {userId} により、userId 変数がルール内で使用可能になります。
+    // match /users/{userId} {
+    //   allow read, update, delete: if request.auth != null && request.auth.uid == userId;
+    //   allow create: if request.auth != null;
+    // }
 
-    // This rule allows anyone with your Firestore database reference to view, edit,
-    // and delete all data in your Firestore database. It is useful for getting
-    // started, but it is configured to expire after 30 days because it
-    // leaves your app open to attackers. At that time, all client
-    // requests to your Firestore database will be denied.
-    //
-    // Make sure to write security rules for your app before that time, or else
-    // all client requests to your Firestore database will be denied until you Update
-    // your rules
-    match /{document=**} {
-      allow read, write: if request.time < timestamp.date(2025, 6, 10);
+    // https://stackoverflow.com/questions/51405539/cloud-firestore-security-rules-allow-write-only-from-firebase-function
+    // 全アクセスを拒否する．ただしfirebase-functionsからのアクセスは妨げない．
+    match /{document=**} {      
+      allow read: if false;
+      allow write: if false;
     }
   }
 }
