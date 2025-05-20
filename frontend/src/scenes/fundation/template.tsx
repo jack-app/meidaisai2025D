@@ -45,8 +45,6 @@ export default class ここをシーン名に変える extends SceneBase {
 
         this.pixiApp = pixiApp;
         
-        // 初期化が終わったら、exampleシーン（このシーン）を表示する
-        this.manager.changeSceneTo(SceneSig.example);
     }
 
     //

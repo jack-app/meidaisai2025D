@@ -4,7 +4,7 @@ import type SceneManager from "./fundation/sceneManager";
 import { Container, Application as PixiApp } from 'pixi.js'
 import SceneSig from "./fundation/signatures";
 
-export default class ここをシーン名に変える extends SceneBase {
+export default class SelectionScene extends SceneBase {
     
     //
     // 初期化処理
@@ -13,7 +13,7 @@ export default class ここをシーン名に変える extends SceneBase {
     constructor(manager: SceneManager) {
         super(
             manager,
-            SceneSig.example // exampleをこのシーンのシグネチャに変える
+            SceneSig.selection
         );
     }
 
@@ -44,9 +44,6 @@ export default class ここをシーン名に変える extends SceneBase {
         ]);
 
         this.pixiApp = pixiApp;
-        
-        // 初期化が終わったら、exampleシーン（このシーン）を表示する
-        this.manager.changeSceneTo(SceneSig.example);
     }
 
     //
