@@ -13,17 +13,34 @@ const isDev =
     || host.startsWith('127.0.0.1') 
     || host.startsWith('::1')
 
+if (isDev) {
+    console.log('開発環境で実行しています．');
+}
+
 // Singleton
 export const userDataManager: IUserDataManager = new UserDataManagerMock()
 export const gameDataProvider: IGameDataProvider = new GameDataProviderMock()
 export const sceneManager = new SceneManager()
 
-// firebase (初期化はindex.tsxへ)
-import { getApp } from 'firebase/app';
+// firebase
+// authやfirestoreが必要な場合はconst.tsからインポートして使う．
 import { getAuth, connectAuthEmulator } from 'firebase/auth';
 import { getFunctions, connectFunctionsEmulator } from 'firebase/functions';
 import { getFirestore, connectFirestoreEmulator } from 'firebase/firestore';
-const firebaseApp = getApp();
+import { initializeApp } from "firebase/app";
+
+const firebaseApp = initializeApp(
+    isDev 
+    ? {
+        projectId: "demo-metype-ffe25",
+        apiKey: "fake-api-key"
+    } 
+    : {
+        projectId: "metype-ffe25",
+        apiKey: "AIzaSyA8p4gso3Jo2N00ABARjlBICy471S58PpU"
+    }
+);
+
 export namespace Firebase {
     // これは使う．
     export const auth = getAuth(firebaseApp);

@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { UserId, UserName, type UserState } from "../../types";
+import { GameRecord, UserId, UserName, type RecordSummary, type UserSetting, type UserState } from "./types";
 import type IUserDataManager from "./interface";
 
 export default class UserDataManagerMock implements IUserDataManager{
@@ -11,15 +11,22 @@ export default class UserDataManagerMock implements IUserDataManager{
         this.listeners.push(callback);
         callback(this.userState);
     }
-    private update(state: UserState) {
+    private updateUserState(state: UserState) {
         this.userState = state;
         this.listeners.forEach((listener) => listener(state));
+    }
+
+    private userSetting: UserSetting = {
+        timeLimitPresentation: true,
+        BGM: true,
+        typingSound: true,
+        otherSoundEffect: true,
     }
 
     constructor() {
         setTimeout(() => {
             console.log("UserDataManagerMock: ログイン状態に切り替えました");
-            this.update(
+            this.updateUserState(
                 {
                     id: UserId.generate(),
                     name: new UserName("John Doe"),
@@ -33,5 +40,34 @@ export default class UserDataManagerMock implements IUserDataManager{
         const [state, setState] = createStore<UserState>(this.userState);
         this.addUserStateListener(setState);
         return state;
+    }
+
+    async getUserSetting(): Promise<UserSetting> {
+        return this.userSetting;
+    }
+    setUserSetting(setting: UserSetting): void {
+        this.userSetting = setting;
+    }
+
+    private summray: RecordSummary = {
+        totalTypeCount: 1000,
+        bestScore: 100,
+    }
+    async getRecordSummary(): Promise<RecordSummary> {
+        return this.summray;
+    }
+
+    private lastRecord: GameRecord | null = null;
+    putRecord(record: GameRecord): void {
+        this.lastRecord = record;
+        this.summray.totalTypeCount += record.correctTypeCount;
+        this.summray.bestScore = Math.max(this.summray.bestScore, record.score);
+    }
+
+    getLastRecord(): GameRecord {
+        if (this.lastRecord === null) {
+            throw new Error("putRecordを呼び出す前にgetLastRecordが呼ばれました．");
+        }
+        return this.lastRecord;
     }
 }
