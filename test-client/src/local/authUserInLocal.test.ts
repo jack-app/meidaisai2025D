@@ -1,8 +1,8 @@
 import { initializeApp } from "firebase/app";
 
 const app = initializeApp({
-    projectId: "metype-ffe25",
-    apiKey: "AIzaSyA8p4gso3Jo2N00ABARjlBICy471S58PpU"
+    projectId: "demo-metype-ffe25",
+    apiKey: "fake-api-key"
 });
 
 import { getAuth, signInAnonymously, connectAuthEmulator, updateCurrentUser } from "firebase/auth";
