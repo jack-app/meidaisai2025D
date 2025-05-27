@@ -17,34 +17,21 @@ export default class TitleScene extends SceneBase {
         );
     }
 
-    private pixiApp!: PixiApp;
-    async preload(): Promise<void> {
-        console.log(`Preloading ${this.sceneSignature}...`);
-        
-        const pixiApp = new PixiApp();
+   private pixiApp!: PixiApp;
+async preload(): Promise<void> {
+    console.log(`Preloading ${this.sceneSignature}...`);
 
-        // 各種初期化を並行して行う．
-        await Promise.all([
-            
-            (async () => {
-                // ここで初期化処理
-                // ...
-            })(),
+    const pixiApp = new PixiApp();
 
-            (async () => {
-                // ここで初期化処理
-                // ...
-            })(),
+    // PixiAppの初期化
+    await pixiApp.init({
+        backgroundAlpha: 0 // キャンバスを透明にする
+    });
 
-            // PixiAppの初期化. 
-            // pixiAppにはthis.pixiAppは初期化後に代入しないとバグるので注意
-            pixiApp.init({
-                backgroundAlpha: 0 // キャンバスを透明にする
-            }),
-        ]);
+    this.pixiApp = pixiApp;
 
-        this.pixiApp = pixiApp;
-    }
+    this.manager.changeSceneTo(SceneSig.title);
+}
 
     //
     // PIXI JSによるキャンバスの描画
@@ -98,9 +85,37 @@ export default class TitleScene extends SceneBase {
     //
 
     makeComponent(): JSXElement {
-        return <>
-            ここでコンポーネントを作成する
-            ...
-        </>
-    }
+        console.log("makeComponent called");
+  return (
+        <div style={{
+            width: '100%',
+            height: '100%',
+            "background-image": 'url(/images/bg.png)',
+            "background-size": 'cover',
+            display: 'flex',
+            "flex-direction": 'column',
+            "justify-content": 'center',
+            "align-items": 'center',
+            gap: '20px',
+        }}>
+            <h1 style={{
+                color: 'white',
+                "font-size": '48px',
+                "font-weight": 'bold'
+            }}>
+                METYPE
+            </h1>
+            <button style={{
+                padding: '10px 20px',
+                "font-size": '18px',
+                "background-color": 'lightblue',
+                border: 'none',
+                "border-radius": '5px'
+            }}>
+                ログイン
+            </button>
+        
+        </div>
+    );
+}
 }
