@@ -98,9 +98,34 @@ export default class SelectionScene extends SceneBase {
     //
 
     makeComponent(): JSXElement {
-        return <>
-            ここでコンポーネントを作成する
-            ...
-        </>
-    }
+    return (
+        <div style={{
+            width: '100%',
+            height: '100%',
+            "background-image": 'url(/images/background.png)',
+            "background-size": 'cover',
+            display: 'flex',
+            "flex-direction": 'column',
+            "justify-content": 'center',
+            "align-items": 'center',
+            gap: '20px'
+        }}>
+            {["設定", "遊び方", "スタート", "成績"].map(label => (
+                <button style={{
+                
+                    width: '400px',
+                    padding: '20px',
+                    "font-size": '20px',
+                    "background-color": '#E3DEF1',
+                    color: 'black',
+                    border: 'none',
+                    "border-radius": '8px'
+                }}>
+                    {label}
+                </button>
+            ))}
+        </div>
+    );
+}
+
 }
