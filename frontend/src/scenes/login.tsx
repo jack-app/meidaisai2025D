@@ -4,11 +4,9 @@ import type SceneManager from "./fundation/sceneManager";
 import { Container, Application as PixiApp } from 'pixi.js'
 import SceneSig from "./fundation/signatures";
 
-export default class LoginScene extends SceneBase {
-    
-    //
-    // 初期化処理
-    //
+// クラスは名前付きエクスポートに変更
+export class LoginScene extends SceneBase {
+    private pixiApp!: PixiApp;
 
     constructor(manager: SceneManager) {
         super(
@@ -17,90 +15,95 @@ export default class LoginScene extends SceneBase {
         );
     }
 
-    private pixiApp!: PixiApp;
     async preload(): Promise<void> {
         console.log(`Preloading ${this.sceneSignature}...`);
-        
         const pixiApp = new PixiApp();
 
-        // 各種初期化を並行して行う．
         await Promise.all([
-            
-            (async () => {
-                // ここで初期化処理
-                // ...
-            })(),
-
-            (async () => {
-                // ここで初期化処理
-                // ...
-            })(),
-
-            // PixiAppの初期化. 
-            // pixiAppにはthis.pixiAppは初期化後に代入しないとバグるので注意
-            pixiApp.init({
-                backgroundAlpha: 0 // キャンバスを透明にする
-            }),
+            (async () => { /* 初期化処理 */ })(),
+            (async () => { /* 初期化処理 */ })(),
+            pixiApp.init({ backgroundAlpha: 0 }),
         ]);
 
         this.pixiApp = pixiApp;
     }
 
-    //
-    // PIXI JSによるキャンバスの描画
-    //
-
     MiddleCanvas(): JSXElement {
         const pixiContainer = this.makePixiAppContent();
 
-        const canvasHolder = <div style={{height: '100%', width: '100%'}}>
+        const canvasHolder = <div style={{ height: '100%', width: '100%' }}>
             {this.pixiApp.canvas}
         </div> as HTMLElement;
 
-        // キャンバスが表示されたら，その大きさに合わせてキャンバス内のコンテンツを配置する．
         onMount(() => {
-            console.log("MiddleCanvas onMount");
             this.arrangeContent(pixiContainer, canvasHolder);
-            // ウィンドウがリサイズされたときは再配置する
             window.addEventListener('resize', () => {
                 this.arrangeContent(pixiContainer, canvasHolder);
             });
-        })
+        });
 
         return canvasHolder;
     }
 
-    // PixiAppのコンテンツを作成する
     makePixiAppContent() {
-        const container = new Container();    
+        const container = new Container();
         this.pixiApp.stage.addChild(container);
-
-        // ここでコンテンツを作成する
-        // ...
-
+        // コンテンツ作成
         return container;
     }
 
-    // PixiAppのコンテンツを配置する
     arrangeContent(contentContainer: Container, canvasHolder: HTMLElement) {
-        this.pixiApp.renderer.resize(
-            canvasHolder.clientWidth, 
-            canvasHolder.clientHeight
-        );
-
-        // ここでキャンバス（canvasHolder）の大きさに合わせてコンテンツを配置する
-        // ...
-
+        this.pixiApp.renderer.resize(canvasHolder.clientWidth, canvasHolder.clientHeight);
+        // 配置処理
     }
-
-    //
-    // コンポーネントを作成する
-    //
 
     makeComponent(): JSXElement {
         return <>
-            ここでコンポーネントを作成する
-            ...
-        </>
+            ここでコンポーネントを作成する...
+        </>;
     }
+}
+
+// 関数コンポーネントはデフォルトエクスポートに
+export default function Login() {
+    onMount(() => {
+        if (!window.google || !window.google.accounts) {
+            console.error("Google Identity Servicesが読み込まれていません");
+            return;
+        }
+
+        window.google.accounts.id.initialize({
+            client_id: "996291379966-oikrm16dmud9n0d8fhardra64mobfudm.apps.googleusercontent.com",
+            callback: handleCredentialResponse,
+        });
+
+        window.google.accounts.id.renderButton(
+            document.getElementById("google-login-button")!,
+            {
+                theme: "outline",
+                size: "large",
+                width: "300",
+            }
+        );
+    });
+
+    function handleCredentialResponse(response: any) {
+        console.log("IDトークン:", response.credential);
+        // ログイン後処理
+    }
+
+    return (
+        <div
+            style={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                height: "100vh",
+                flexDirection: "column",
+            }}
+        >
+            <h2>Googleでログイン</h2>
+            <div id="google-login-button"></div>
+        </div>
+    );
 }

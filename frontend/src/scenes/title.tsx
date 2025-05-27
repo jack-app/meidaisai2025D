@@ -13,7 +13,8 @@ export default class TitleScene extends SceneBase {
     constructor(manager: SceneManager) {
         super(
             manager,
-            SceneSig.title
+            SceneSig.title,
+             { initialScene: true } 
         );
     }
 
@@ -86,6 +87,27 @@ async preload(): Promise<void> {
 
     makeComponent(): JSXElement {
         console.log("makeComponent called");
+ onMount(() => {
+        if (window.google && window.google.accounts && window.google.accounts.id) {
+            window.google.accounts.id.initialize({
+                client_id: "996291379966-oikrm16dmud9n0d8fhardra64mobfudm.apps.googleusercontent.com",
+                callback: (response) => {
+                    console.log("Googleログイン成功", response);
+                    // ここでバックエンドと通信するなどの処理を書く
+                    //そのあとにセレクト画面へ遷移
+    this.manager.changeSceneTo(SceneSig.selection);
+                },
+            });
+
+            window.google.accounts.id.renderButton(
+                document.getElementById("g_id_signin"),
+                { theme: "outline", size: "large" }
+            );
+        } else {
+            console.error("GoogleログインAPIが読み込まれていません");
+        }
+    });
+
   return (
         <div style={{
             width: '100%',
@@ -106,16 +128,14 @@ async preload(): Promise<void> {
             }}>
                 METYPE
             </h1>
-            <button style={{
-                padding: '20px 100px',
-                "font-size": '30px',
-                "background-color": 'lightblue',
-                border: 'none',
-                "border-radius": '5px'
-            }}>
-                ログイン
-            </button>
-        <button
+            <div style={{ display: "flex", "flex-direction": "column", "align-items": "center", gap: "1rem" }}>
+
+
+  {/* Googleログインボタンの表示位置 */}
+  <div id="g_id_signin"></div>
+</div>
+
+    <button
   style={{
     color: 'white',
     "font-size": '16px',
@@ -125,7 +145,10 @@ async preload(): Promise<void> {
     "border-radius": '4px',
     cursor: 'pointer'
   }}
-  onClick={() => alert('ゲストモードでログインします')}
+  onClick={() => {
+    console.log("ゲストモードでログインしました");
+    this.manager.changeSceneTo(SceneSig.selection);  // ← セレクト画面へ
+  }}
 >
   ゲスト
 </button>
@@ -134,18 +157,4 @@ async preload(): Promise<void> {
     );
 }
 }
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
 
-export default function title() {
-  const navigate = useNavigate();
-
-  return (
-    <div style={{ padding: 20 }}>
-      <h1>タイトルページ</h1>
-      <button onClick={() => navigate('/login')}>
-        ログインページへ
-      </button>
-    </div>
-  );
-}
