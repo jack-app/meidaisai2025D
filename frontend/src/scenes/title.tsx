@@ -100,22 +100,52 @@ async preload(): Promise<void> {
         }}>
             <h1 style={{
                 color: 'white',
-                "font-size": '48px',
+                "font-size": '150px',
                 "font-weight": 'bold'
+               
             }}>
                 METYPE
             </h1>
             <button style={{
-                padding: '10px 20px',
-                "font-size": '18px',
+                padding: '20px 100px',
+                "font-size": '30px',
                 "background-color": 'lightblue',
                 border: 'none',
                 "border-radius": '5px'
             }}>
                 ログイン
             </button>
-        
+        <button
+  style={{
+    color: 'white',
+    "font-size": '16px',
+    "background-color": '#007bff',
+    padding: '8px 16px',
+    border: 'none',
+    "border-radius": '4px',
+    cursor: 'pointer'
+  }}
+  onClick={() => alert('ゲストモードでログインします')}
+>
+  ゲスト
+</button>
+
         </div>
     );
 }
+}
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
+export default function title() {
+  const navigate = useNavigate();
+
+  return (
+    <div style={{ padding: 20 }}>
+      <h1>タイトルページ</h1>
+      <button onClick={() => navigate('/login')}>
+        ログインページへ
+      </button>
+    </div>
+  );
 }

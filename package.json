@@ -16,5 +16,8 @@
   "bugs": {
     "url": "https://github.com/jack-app/meidaisai2025D/issues"
   },
-  "homepage": "https://github.com/jack-app/meidaisai2025D#readme"
+  "homepage": "https://github.com/jack-app/meidaisai2025D#readme",
+  "dependencies": {
+    "react-router-dom": "^7.6.1"
+  }
 }
