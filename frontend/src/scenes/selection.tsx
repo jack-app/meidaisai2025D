@@ -91,6 +91,11 @@ export default class SelectionScene extends SceneBase {
         // ここでキャンバス（canvasHolder）の大きさに合わせてコンテンツを配置する
         // ...
 
+    contentContainer.position.set(
+    canvasHolder.clientWidth / 2,
+    canvasHolder.clientHeight / 2
+  );
+
     }
 
     //

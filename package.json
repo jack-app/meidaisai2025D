@@ -18,6 +18,7 @@
   },
   "homepage": "https://github.com/jack-app/meidaisai2025D#readme",
   "dependencies": {
+    "google-one-tap": "^1.0.6",
     "react-router-dom": "^7.6.1"
   }
 }

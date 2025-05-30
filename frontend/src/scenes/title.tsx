@@ -3,6 +3,16 @@ import SceneBase from "./fundation/sceneBase";
 import type SceneManager from "./fundation/sceneManager";
 import { Container, Application as PixiApp } from 'pixi.js'
 import SceneSig from "./fundation/signatures";
+import type { CredentialResponse } from "google-one-tap";
+
+
+export {};
+
+declare global {
+  interface Window {
+    google: any;
+  }
+}
 
 export default class TitleScene extends SceneBase {
     
@@ -39,7 +49,7 @@ async preload(): Promise<void> {
     //
 
     MiddleCanvas(): JSXElement {
-        const pixiContainer = this.makePixiAppContent();
+     this.makePixiAppContent();
 
         const canvasHolder = <div style={{height: '100%', width: '100%'}}>
             {this.pixiApp.canvas}
@@ -48,10 +58,10 @@ async preload(): Promise<void> {
         // キャンバスが表示されたら，その大きさに合わせてキャンバス内のコンテンツを配置する．
         onMount(() => {
             console.log("MiddleCanvas onMount");
-            this.arrangeContent(pixiContainer, canvasHolder);
+            this.arrangeContent(canvasHolder);
             // ウィンドウがリサイズされたときは再配置する
             window.addEventListener('resize', () => {
-                this.arrangeContent(pixiContainer, canvasHolder);
+                this.arrangeContent(canvasHolder);
             });
         })
 
@@ -70,7 +80,7 @@ async preload(): Promise<void> {
     }
 
     // PixiAppのコンテンツを配置する
-    arrangeContent(contentContainer: Container, canvasHolder: HTMLElement) {
+    arrangeContent(canvasHolder: HTMLElement) {
         this.pixiApp.renderer.resize(
             canvasHolder.clientWidth, 
             canvasHolder.clientHeight
@@ -91,7 +101,7 @@ async preload(): Promise<void> {
         if (window.google && window.google.accounts && window.google.accounts.id) {
             window.google.accounts.id.initialize({
                 client_id: "996291379966-oikrm16dmud9n0d8fhardra64mobfudm.apps.googleusercontent.com",
-                callback: (response) => {
+                callback: (response: CredentialResponse) => {
                     console.log("Googleログイン成功", response);
                     // ここでバックエンドと通信するなどの処理を書く
                     //そのあとにセレクト画面へ遷移
