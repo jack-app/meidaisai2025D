@@ -7,15 +7,15 @@ import styles from "./game.module.css";
 import { type GameStats } from "../data_interface/user_data/types";
 import { userDataManager } from "../const.ts";
 
-import { type Problem, ProblemInstances } from "../game_data/problems.ts";
+import { SourceCode, SourceCodeInstances } from "../game_data/problems.ts";
 
 // ゲームデータプロバイダーのモック
 class GameDataProvider {
-  static getProblem(): Problem {
+  static getProblem(): SourceCode {
     // ProblemInstancesからランダムに問題を取得して返す．
-    return ProblemInstances[
-      Math.floor(Math.random() * ProblemInstances.length)
-      % ProblemInstances.length
+    return SourceCodeInstances[
+      Math.floor(Math.random() * SourceCodeInstances.length)
+      % SourceCodeInstances.length
     ];
   }
 }
@@ -29,7 +29,7 @@ export default class GameScene extends SceneBase {
     super(manager, SceneSig.game);
   }
   private pixiApp!: PixiApp;
-  private problemData!: Problem;
+  private problemData!: SourceCode;
   private currentPosition = 0;
   private textContainer!: Container;
   private backgroundContainer!: Container;
