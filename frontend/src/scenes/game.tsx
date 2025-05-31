@@ -8,16 +8,17 @@ import { type GameStats } from "../data_interface/user_data/types";
 import { userDataManager, Host } from "../const.ts";
 import metype from "/images/METYPE.png";
 
-import { SourceCode, SourceCodeInstances } from "../game_data/problems.ts";
+import { Problem } from "../game_data/problems.ts";
+import SourceCodeInstances from "../game_data/instances.ts";
 
 // ゲームデータプロバイダーのモック
 class GameDataProvider {
-  static getProblem(): SourceCode {
+  static getProblem(): Problem {
     // ProblemInstancesからランダムに問題を取得して返す．
     return SourceCodeInstances[
       Math.floor(Math.random() * SourceCodeInstances.length)
       % SourceCodeInstances.length
-    ];
+    ].generateProblem();
   }
 }
 
@@ -30,7 +31,8 @@ export default class GameScene extends SceneBase {
     super(manager, SceneSig.game);
   }
   private pixiApp!: PixiApp;
-  private problemData!: SourceCode;
+  private problemData!: Problem;
+  /** @deprecated problemDataが現在位置の情報を持つようになったためdeprecated */
   private currentPosition = 0;
   private textContainer!: Container;
   private backgroundContainer!: Container;
@@ -60,27 +62,6 @@ export default class GameScene extends SceneBase {
     console.log(`Preloading ${this.sceneSignature}...`);
 
     const pixiApp = new PixiApp();
-    
-    // await Promise.all([
-    //   (async () => {
-    //     // 問題データの読み込み
-    //     console.log("loading problem data ")
-    //     this.problemData = GameDataProvider.getMockProblem();
-    //     console.log(this.problemData)
-    //     console.log("loaded problem data ")
-    //   })(),
-      
-    //   (async () => {
-    //     // その他の初期化処理
-    //     this.currentPosition = 0;
-    //   })(),
-      
-    //   // PixiAppの初期化
-    //   pixiApp.init({ 
-    //     backgroundAlpha: 0 
-    //   }),
-    // ]);
-
     await pixiApp.init({ 
       backgroundAlpha: 0 
     })
@@ -89,11 +70,6 @@ export default class GameScene extends SceneBase {
       (async () => {
         // 問題データの読み込み
         this.problemData = GameDataProvider.getProblem();
-      })(),
-      
-      (async () => {
-        // その他の初期化処理
-        this.currentPosition = 0;
       })(),
     ]);
     this.pixiApp = pixiApp;
@@ -152,19 +128,18 @@ export default class GameScene extends SceneBase {
     
     event.preventDefault();
     
-    const targetChar = this.problemData.content[this.currentPosition];
+    const targetChar = this.problemData.charAtCursor();
     
     if (event.key === targetChar) {
       // 正解
-      this.currentPosition++;
+      this.problemData.proceed();
       this.setStats(prev => ({
         ...prev,
         correctTypes: prev.correctTypes + 1
       }));
-
       
       // 問題完了チェック
-      if (this.currentPosition >= this.problemData.content.length) {
+      if (this.problemData.completed) {
         this.endGame(this.statsSignal[0]());
       }
     } else {
@@ -182,6 +157,38 @@ export default class GameScene extends SceneBase {
     this.updateDisplay();
   }
 
+
+  private readonly fontSize = 20;
+  private readonly lineHeight = 24;
+  private readonly charWidth = 12;
+
+  // 文字の表示処理
+  private putCharAt(x: number, y: number, char: string, backgroundColor: number, textColor: number): void {
+    // 背景矩形
+    if (backgroundColor !== 0x000000) {
+      const bg = new Graphics();
+      bg.rect(x - 2, y - 2, this.charWidth, this.lineHeight);
+      bg.fill(backgroundColor);
+      this.backgroundContainer.addChild(bg);
+    }
+    
+    // 文字
+
+    const style = new TextStyle({
+      fontFamily: 'Consolas',
+      fontSize: this.fontSize,
+      fill: textColor,
+    });
+
+    const text = new Text(char, style);
+    text.x = x;
+    text.y = y;
+    this.textContainer.addChild(text);
+  }
+
+  private readonly firstLetterPosX = 20;
+  private readonly firstLinePosY = 20;  
+
   // 表示更新
   private updateDisplay(): void {
     console.log(`updating display ${this.sceneSignature}...`);
@@ -192,86 +199,62 @@ export default class GameScene extends SceneBase {
     this.backgroundContainer.removeChildren();
     
     console.log(this.problemData)
-    const content = this.problemData.content;
-    const fontSize = 20;
-    const lineHeight = 24;
-    const charWidth = 12;
     
+    let currentX = this.firstLetterPosX;
+    let currentY = this.firstLinePosY;
 
-
-    let currentX = 20;
-    let currentY = 20;
-    let currentPositionX = 20;
-    let currentPositionY = 20; // 現在入力位置のY座標を記録
-
-    
-    for (let i = 0; i < content.length; i++) {
-      const char = content[i];
-      
-      // 改行処理
-      if (char === '\n') {
-        currentX = 20;
-        currentY += lineHeight;
-        continue;
+    // ProblemDataから現在位置より前の文字を取得
+    for (const token of this.problemData.tokensBeforeCursor()) {
+      for (const char of token.content) {
+        // 改行処理
+        if (char === '\n') {
+          currentX = this.firstLetterPosX;
+          currentY += this.lineHeight;
+          continue;
+        }
+        // 文字の背景色を決定
+        const backgroundColor = 0x22C55E; // 緑
+        const textColor = 0x000000; // 黒
+        this.putCharAt(currentX, currentY, char, backgroundColor, textColor);
+        currentX += this.charWidth;
       }
-          if (i === this.currentPosition) {
-      currentPositionY = currentY;
-      currentPositionX = currentX;
     }
-      // 文字の背景色を決定
-      let backgroundColor = 0x000000; // デフォルト（透明）
-      let textColor = 0xFFFFFF; // 白
-      
-      if (i < this.currentPosition) {
-        // 入力済み（緑）
-        backgroundColor = 0x22C55E;
-        textColor = 0x000000;
-      } else if (i === this.currentPosition) {
-        // 現在位置（黄色）
-        backgroundColor = 0xEAB308;
-        textColor = 0xeeeeee;
-      }
-      
-      // 背景矩形
-      if (backgroundColor !== 0x000000) {
-        const bg = new Graphics();
-        bg.rect(currentX - 2, currentY - 2, charWidth, lineHeight);
-        bg.fill(backgroundColor);
-        this.backgroundContainer.addChild(bg);
-      }
-      
-      // 文字
 
-      const style = new TextStyle({
-        fontFamily: 'Consolas',
-        fontSize: fontSize,
-        fill: textColor,
-      });
+    // 現在入力位置を記録
+    const curosrPositionX = currentX;
+    const cursorPositionY = currentY;
+    // 現在の文字を取得 改行は取得され得ないので，改行処理は入れない．
+    {
+      const backgroundColor = 0xEAB308; // 黄色
+      const textColor = 0xeeeeee; // 灰色
+      const currentChar = this.problemData.charAtCursor();
+      this.putCharAt(currentX, currentY, currentChar, backgroundColor, textColor);
+      currentX += this.charWidth;
+    }
 
-      const text = new Text(char, style);
-      text.x = currentX;
-      text.y = currentY;
-      this.textContainer.addChild(text);
-      
-      currentX += charWidth;
-      if (this.problemData.content[this.currentPosition] === "\n"){
-        this.currentPosition += 1;
+    for (const token of this.problemData.tokensAfterCursor()) {
+      for (const char of token.content) {
+        // 改行処理
+        if (char === '\n') {
+          currentX = this.firstLetterPosX;
+          currentY += this.lineHeight;
+          continue;
+        }
+        const backgroundColor = 0x000000; // 透明
+        const textColor = 0xFFFFFF; // 白
+        this.putCharAt(currentX, currentY, char, backgroundColor, textColor);
+        currentX += this.charWidth;
       }
-      if (this.problemData.content[this.currentPosition] === " "){
-        this.currentPosition += 1;
-      }
-      if (this.currentPosition === content.length) {
-        this.endGame(this.statsSignal[0]());
-      }
-    }    
+    }
+
     const viewportHeight = this.pixiApp.renderer.height;
-    const scrollOffsetY = Math.max(0, currentPositionY - viewportHeight / 2);
+    const scrollOffsetY = Math.max(0, cursorPositionY - viewportHeight / 2);
 
     this.textContainer.y = -scrollOffsetY + 40;
     this.backgroundContainer.y = -scrollOffsetY + 40;
 
     const viewportWidth = this.pixiApp.renderer.width;
-    const scrollOffsetX = Math.max(0, currentPositionX - viewportWidth / 2);
+    const scrollOffsetX = Math.max(0, curosrPositionX - viewportWidth / 2);
 
     this.textContainer.x = -scrollOffsetX + 20;
     this.backgroundContainer.x = -scrollOffsetX + 20;
