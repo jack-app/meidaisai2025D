@@ -113,9 +113,9 @@ export default class UserDataManager implements IUserDataManager {
             }
 
             const data = await response.json();
-            this.userSetting = data.settings
+            this.userSetting = data.setting
             this.recordSummary = data.records || {
-                totalTypeCount: 0,
+                totalTypeByte: 0,
                 bestWPM: 0
             };
 
@@ -159,7 +159,7 @@ export default class UserDataManager implements IUserDataManager {
                     'Content-Type': 'application/json',
                     'Authorization': `Bearer ${token}`
                 },
-                body: JSON.stringify({ settings: setting })
+                body: JSON.stringify({ setting: setting })
             });
 
             if (!response.ok) {
@@ -183,7 +183,7 @@ export default class UserDataManager implements IUserDataManager {
         // ログインしていない場合は空のサマリーを返す
         if (!this.userState.isLoggedIn) {
             return {
-                totalTypeCount: 0,
+                totalTypeByte: 0,
                 bestWPM: 0
             };
         }
@@ -207,7 +207,7 @@ export default class UserDataManager implements IUserDataManager {
 
             if (!this.recordSummary) {
                 this.recordSummary = {
-                    totalTypeCount: 0,
+                    totalTypeByte: 0,
                     bestWPM: 0
                 };
             }
@@ -217,7 +217,7 @@ export default class UserDataManager implements IUserDataManager {
             console.error('サマリー取得エラー:', error);
             // エラーの場合は空のサマリーを返す
             return {
-                totalTypeCount: 0,
+                totalTypeByte: 0,
                 bestWPM: 0
             };
         }
@@ -230,7 +230,7 @@ export default class UserDataManager implements IUserDataManager {
 
         // ローカルサマリーを更新
         if (this.recordSummary) {
-            this.recordSummary.totalTypeCount += record.correctTypes;
+            this.recordSummary.totalTypeByte += record.correctTypes;
             this.recordSummary.bestWPM = Math.max(
                 this.recordSummary.bestWPM,
                 record.wpm
@@ -254,7 +254,7 @@ export default class UserDataManager implements IUserDataManager {
                 recordedAt: new Date().toISOString()
             };
 
-            const response = await fetch(new URL('/api/record', Host.functions).toString(), {
+            const response = await fetch(new URL('/api/recordss', Host.functions).toString(), {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -288,7 +288,7 @@ export default class UserDataManager implements IUserDataManager {
             const token = await this.getAuthToken();
             if (!token) throw new Error('認証トークンの取得に失敗しました');
 
-            const response = await fetch(new URL('/api/record/latest', Host.functions).toString(), {
+            const response = await fetch(new URL('/api/records/latest', Host.functions).toString(), {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
