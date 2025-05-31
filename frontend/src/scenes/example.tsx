@@ -41,7 +41,7 @@ export default class ExampleScene extends SceneBase {
         this.pixiApp = pixiApp;
         
         // 初期化が終わったら、exampleシーン（このシーン）を表示する
-        this.manager.changeSceneTo(SceneSig.example);
+        //this.manager.changeSceneTo(SceneSig.example);
     }
 
     //
