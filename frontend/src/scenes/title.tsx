@@ -1,13 +1,10 @@
-import { onMount, type JSXElement } from "solid-js";
+import { onMount, type JSXElement, createEffect } from "solid-js";
 import SceneBase from "./fundation/sceneBase";
 import type SceneManager from "./fundation/sceneManager";
 import { Container, Application as PixiApp } from "pixi.js";
 import SceneSig from "./fundation/signatures";
-
-// ログイン処理はfirebase authを使う形に変更
+import { userDataManager } from "../const"; // const.tsからインポートに変更
 import type { CredentialResponse } from "google-one-tap";
-
-// タイトルシーンとログインシーンは統合
 
 declare global {
   interface Window {
@@ -16,33 +13,23 @@ declare global {
 }
 
 export default class TitleScene extends SceneBase {
-  //
-  // 初期化処理
-  //
-
   constructor(manager: SceneManager) {
     super(manager, SceneSig.title, { initialScene: true });
   }
 
   private pixiApp!: PixiApp;
+
   async preload(): Promise<void> {
     console.log(`Preloading ${this.sceneSignature}...`);
 
     const pixiApp = new PixiApp();
-
-    // PixiAppの初期化
     await pixiApp.init({
-      backgroundAlpha: 0, // キャンバスを透明にする
+      backgroundAlpha: 0,
     });
 
     this.pixiApp = pixiApp;
-
     this.manager.changeSceneTo(SceneSig.title);
   }
-
-  //
-  // PIXI JSによるキャンバスの描画
-  //
 
   MiddleCanvas(): JSXElement {
     this.makePixiAppContent();
@@ -51,11 +38,9 @@ export default class TitleScene extends SceneBase {
       <div style={{ height: "100%", width: "100%" }}>{this.pixiApp.canvas}</div>
     ) as HTMLElement;
 
-    // キャンバスが表示されたら，その大きさに合わせてキャンバス内のコンテンツを配置する．
     onMount(() => {
       console.log("MiddleCanvas onMount");
       this.arrangeContent(canvasHolder);
-      // ウィンドウがリサイズされたときは再配置する
       window.addEventListener("resize", () => {
         this.arrangeContent(canvasHolder);
       });
@@ -64,57 +49,44 @@ export default class TitleScene extends SceneBase {
     return canvasHolder;
   }
 
-  // PixiAppのコンテンツを作成する
   makePixiAppContent() {
     const container = new Container();
     this.pixiApp.stage.addChild(container);
-
-    // ここでコンテンツを作成する
-    // ...
-
     return container;
   }
 
-  // PixiAppのコンテンツを配置する
   arrangeContent(canvasHolder: HTMLElement) {
     this.pixiApp.renderer.resize(
       canvasHolder.clientWidth,
       canvasHolder.clientHeight
     );
-
-    // ここでキャンバス（canvasHolder）の大きさに合わせてコンテンツを配置する
-    // ...
   }
 
-  //
-  // コンポーネントを作成する
-  //
+  // Googleログインボタンのクリックハンドラー
+  private async handleGoogleLogin() {
+    try {
+      const success = await userDataManager.signInWithGoogle();
+      if (success) {
+        console.log("Googleログイン成功");
+        // ログイン成功は createEffect で自動的に処理される
+      } else {
+        console.error("Googleログインに失敗しました");
+      }
+    } catch (error) {
+      console.error("ログインエラー:", error);
+    }
+  }
 
   makeComponent(): JSXElement {
     console.log("makeComponent called");
-    onMount(() => {
-      if (
-        window.google &&
-        window.google.accounts &&
-        window.google.accounts.id
-      ) {
-        window.google.accounts.id.initialize({
-          client_id:
-            "996291379966-oikrm16dmud9n0d8fhardra64mobfudm.apps.googleusercontent.com",
-          callback: (response: CredentialResponse) => {
-            console.log("Googleログイン成功", response);
-            // ここでバックエンドと通信するなどの処理を書く
-            //そのあとにセレクト画面へ遷移
-            this.manager.changeSceneTo(SceneSig.selection);
-          },
-        });
 
-        window.google.accounts.id.renderButton(
-          document.getElementById("g_id_signin"),
-          { theme: "outline", size: "large" }
-        );
-      } else {
-        console.error("GoogleログインAPIが読み込まれていません");
+    const userState = userDataManager.useUserState();
+
+    // ログイン状態が変わったら自動的に遷移
+    createEffect(() => {
+      if (userState.isLoggedIn) {
+        console.log("ログイン状態を検知、セレクト画面へ遷移");
+        this.manager.changeSceneTo(SceneSig.selection);
       }
     });
 
@@ -141,6 +113,7 @@ export default class TitleScene extends SceneBase {
         >
           METYPE
         </h1>
+
         <div
           style={{
             display: "flex",
@@ -149,27 +122,43 @@ export default class TitleScene extends SceneBase {
             gap: "1rem",
           }}
         >
-          {/* Googleログインボタンの表示位置 */}
-          <div id="g_id_signin"></div>
-        </div>
+          {/* Firebaseログインボタン */}
+          <button
+            style={{
+              color: "white",
+              "font-size": "16px",
+              "background-color": "#4285f4",
+              padding: "12px 24px",
+              border: "none",
+              "border-radius": "4px",
+              cursor: "pointer",
+              "min-width": "200px",
+            }}
+            onClick={() => this.handleGoogleLogin()}
+          >
+            Googleでログイン
+          </button>
 
-        <button
-          style={{
-            color: "white",
-            "font-size": "16px",
-            "background-color": "#007bff",
-            padding: "8px 16px",
-            border: "none",
-            "border-radius": "4px",
-            cursor: "pointer",
-          }}
-          onClick={() => {
-            console.log("ゲストモードでログインしました");
-            this.manager.changeSceneTo(SceneSig.selection); // ← セレクト画面へ
-          }}
-        >
-          ゲスト
-        </button>
+          {/* ゲストログインボタン */}
+          <button
+            style={{
+              color: "white",
+              "font-size": "16px",
+              "background-color": "#007bff",
+              padding: "8px 16px",
+              border: "none",
+              "border-radius": "4px",
+              cursor: "pointer",
+              "min-width": "200px",
+            }}
+            onClick={() => {
+              console.log("ゲストモードでログインしました");
+              this.manager.changeSceneTo(SceneSig.selection);
+            }}
+          >
+            ゲストで続行
+          </button>
+        </div>
       </div>
     );
   }
