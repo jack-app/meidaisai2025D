@@ -95,8 +95,8 @@ async function addGameRecord(req: Request, res: Response) {
             const userData = userDoc.data() || {};
             const currentRecords = userData.records || { totalTypeByte: 0, bestWPM: 0 };
 
-            totalTypeByte = (currentRecords.totalTypeByte || 0) + gameRecord.correctTypeByte;
-            const byte = gameRecord.correctTypeByte;
+            totalTypeByte = (currentRecords.totalTypeByte || 0) + gameRecord.correctTypes;
+            const byte = gameRecord.correctTypes;
             bestWPM = Math.max(currentRecords.bestWPM || 0, byte);
 
             transaction.set(userRef, {
