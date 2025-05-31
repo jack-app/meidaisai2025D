@@ -388,19 +388,16 @@ MiddleCanvas(): JSXElement {
             <div class={styles.containerStyle}>
                 <div class={styles.resultStyle}> &lt;Result&gt; </div>
                 <div>
-                    <div class={styles.textStyle}> 正解タイプ数 = <span style={{"color": "#22C55E"}}>{this.stats().correctTypes}</span></div>
+                    <div class={styles.textStyle}> correct = <span style={{"color": "#22C55E"}}>{this.stats().correctTypes} </span>byte</div>
                 </div>
                 <div>
-                    <div class={styles.textStyle}> ミスタイプ数 = <span style={{"color": "#22C55E"}}>{this.stats().mistypes}</span></div>
+                    <div class={styles.textStyle}> miss = <span style={{"color": "#22C55E"}}>{this.stats().mistypes}</span>byte</div>
                 </div>
                 <div>
-                    <div class={styles.textStyle}> 正解率 = <span style={{"color": "#22C55E"}}>{this.stats().correctRate}</span></div>
+                    <div class={styles.textStyle}> correctRate = <span style={{"color": "#22C55E"}}>{this.stats().correctRate}%</span></div>
                 </div>
                 <div>
                     <div class={styles.textStyle}> WPM = <span style={{"color": "#22C55E"}}>{this.stats().wpm}</span></div>
-                </div>
-                <div>
-                    <div class={styles.textStyle}> score = <span style={{"color": "#22C55E"}}>100点満点</span></div>
                 </div>
                 <div class={styles.resultStyle}> &lt;/Result&gt; </div>
             </div>

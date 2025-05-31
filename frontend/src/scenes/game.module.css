@@ -65,7 +65,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
+    align-content: flex-start;
     padding-left: 50px;
     background-color: #333;
 }
@@ -94,7 +94,7 @@
 .outerButton {
   display: flex;
   justify-content: center;
-  align-items: start;
+  align-items: flex-start;
   height: 20%;
   background-color: #333;
 }
