@@ -119,7 +119,7 @@ export default class SelectionScene extends SceneBase {
                 {label: "設定", sig: SceneSig.setting}, 
                 {label:"遊び方", sig:SceneSig.explanation}, 
                 {label: "スタート", sig: SceneSig.game}, 
-                {label: "成績", sig: SceneSig.game}
+                {label: "成績", sig: SceneSig.record}
             ].map(({label, sig}) => (
                 <button style={{
                     width: '400px',
