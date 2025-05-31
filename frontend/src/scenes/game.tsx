@@ -5,7 +5,8 @@ import { Container, Application as PixiApp, Text, TextStyle, Graphics } from 'pi
 import SceneSig from "./fundation/signatures";
 import styles from "./game.module.css";
 import { type GameStats } from "../data_interface/user_data/types";
-import { userDataManager } from "../const.ts";
+import { userDataManager, Host } from "../const.ts";
+import metype from "/images/METYPE.png";
 
 import { SourceCode, SourceCodeInstances } from "../game_data/problems.ts";
 
@@ -115,8 +116,8 @@ export default class GameScene extends SceneBase {
       
       this.setStats(prev => ({
         ...prev,
-        timeRemaining: prev.timeRemaining - 1
-                // timeRemaining: prev.timeRemaining 
+        // timeRemaining: prev.timeRemaining - 6
+                timeRemaining: prev.timeRemaining 
       }));
       this.setStats(prev => ({
         ...prev,
@@ -147,7 +148,7 @@ export default class GameScene extends SceneBase {
     }
 
     // 特殊キーは無視
-    if (event.key.length > 1 && event.key !== 'Tab') return;
+    if (event.key.length > 1 && event.key !== 'Tab' || event.key ===' ') return;
     
     event.preventDefault();
     
@@ -196,8 +197,13 @@ export default class GameScene extends SceneBase {
     const lineHeight = 24;
     const charWidth = 12;
     
+
+
     let currentX = 20;
     let currentY = 20;
+    let currentPositionX = 20;
+    let currentPositionY = 20; // 現在入力位置のY座標を記録
+
     
     for (let i = 0; i < content.length; i++) {
       const char = content[i];
@@ -208,7 +214,10 @@ export default class GameScene extends SceneBase {
         currentY += lineHeight;
         continue;
       }
-      
+          if (i === this.currentPosition) {
+      currentPositionY = currentY;
+      currentPositionX = currentX;
+    }
       // 文字の背景色を決定
       let backgroundColor = 0x000000; // デフォルト（透明）
       let textColor = 0xFFFFFF; // 白
@@ -220,7 +229,7 @@ export default class GameScene extends SceneBase {
       } else if (i === this.currentPosition) {
         // 現在位置（黄色）
         backgroundColor = 0xEAB308;
-        textColor = 0x000000;
+        textColor = 0xeeeeee;
       }
       
       // 背景矩形
@@ -248,10 +257,25 @@ export default class GameScene extends SceneBase {
       if (this.problemData.content[this.currentPosition] === "\n"){
         this.currentPosition += 1;
       }
+      if (this.problemData.content[this.currentPosition] === " "){
+        this.currentPosition += 1;
+      }
       if (this.currentPosition === content.length) {
         this.endGame(this.statsSignal[0]());
       }
     }    
+    const viewportHeight = this.pixiApp.renderer.height;
+    const scrollOffsetY = Math.max(0, currentPositionY - viewportHeight / 2);
+
+    this.textContainer.y = -scrollOffsetY + 40;
+    this.backgroundContainer.y = -scrollOffsetY + 40;
+
+    const viewportWidth = this.pixiApp.renderer.width;
+    const scrollOffsetX = Math.max(0, currentPositionX - viewportWidth / 2);
+
+    this.textContainer.x = -scrollOffsetX + 20;
+    this.backgroundContainer.x = -scrollOffsetX + 20;
+
   }
 
 MiddleCanvas(): JSXElement {
@@ -278,7 +302,7 @@ MiddleCanvas(): JSXElement {
   return (
     <div
       ref={el => containerDiv = el!}
-      style={{ height: '100%', width: '100%', position: 'relative' }}
+      style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden'}}
     />
   );
 }
@@ -306,10 +330,16 @@ MiddleCanvas(): JSXElement {
       canvasHolder.clientHeight
     );
     
+  if (this.pixiApp.canvas) {
+    this.pixiApp.canvas.style.width = '100%';
+    this.pixiApp.canvas.style.height = '100%';
+  }
+
     // コンテンツを中央に配置
-    const padding = 40;
+    const padding = 0;
     contentContainer.x = padding;
-    contentContainer.y = padding;
+    // contentContainer.y = padding;
+    this.updateDisplay();
   }
 
   // コンポーネントを作成する
@@ -317,7 +347,7 @@ MiddleCanvas(): JSXElement {
     return <>
       <div class={styles.whole}>
         <div class={styles.whole2}>
-          <h1 class={styles.title}>metype</h1>
+          <img src={metype} style={{"height": "12vh", "border-radius": "8px"}}/>
           <div class={styles.situation}>
             <div class={styles.situationExplain}>
               <div class={styles.situationExplainTag}>正解</div>
@@ -355,10 +385,13 @@ MiddleCanvas(): JSXElement {
         {!this.gameStarted() && !this.gameEnded() && (
           <div class={styles.start}>
               <div class={styles.startText}>
-                <p>Press Enter to start</p>
+                <h3>Enterを押してゲームを開始して下さい</h3>
               </div>
               <div class={styles.startText}>
-                <p>Time limit: {this.stats().totalTime}seconds</p>
+                <h3>制限時間：{this.stats().totalTime}秒</h3>
+              </div>
+              <div class={styles.startText}>
+                <p>ゲーム中、<span class={styles.key}>Space</span>・<span class={styles.key}>Enter</span>キーを押す必要はありません</p>
               </div>
           </div>
         )}
@@ -369,19 +402,16 @@ MiddleCanvas(): JSXElement {
             <div class={styles.containerStyle}>
                 <div class={styles.resultStyle}> &lt;Result&gt; </div>
                 <div>
-                    <div class={styles.textStyle}> 正解タイプ数 = <span style={{"color": "#22C55E"}}>{this.stats().correctTypes}</span></div>
+                    <div class={styles.textStyle}> correct = <span style={{"color": "#22C55E"}}>{this.stats().correctTypes} </span>byte</div>
                 </div>
                 <div>
-                    <div class={styles.textStyle}> ミスタイプ数 = <span style={{"color": "#22C55E"}}>{this.stats().mistypes}</span></div>
+                    <div class={styles.textStyle}> miss = <span style={{"color": "#22C55E"}}>{this.stats().mistypes} </span>byte</div>
                 </div>
                 <div>
-                    <div class={styles.textStyle}> 正解率 = <span style={{"color": "#22C55E"}}>{this.stats().correctRate}</span></div>
+                    <div class={styles.textStyle}> correctRate = <span style={{"color": "#22C55E"}}>{this.stats().correctRate} </span>%</div>
                 </div>
                 <div>
                     <div class={styles.textStyle}> WPM = <span style={{"color": "#22C55E"}}>{this.stats().wpm}</span></div>
-                </div>
-                <div>
-                    <div class={styles.textStyle}> score = <span style={{"color": "#22C55E"}}>100点満点</span></div>
                 </div>
                 <div class={styles.resultStyle}> &lt;/Result&gt; </div>
             </div>
@@ -390,46 +420,20 @@ MiddleCanvas(): JSXElement {
                     <span>return</span> home;
                 </button>
             </div>
-            </div>
-          
-          // <div class={styles.end}>
-            // <h2 style={{"color": "#EAB308"}}>ゲーム終了！</h2>
-            // <p style={{"color": "#EAB308"}}>Enterキーを押して次の画面に進んでください</p>
-            // <div style={{"margin": "20px 0"}}>
-            //   <p>正解タイプ数: <span style={{"color": "#22C55E"}}>{this.stats().correctTypes}</span></p>
-            //   <p>ミスタイプ数: <span style={{"color": "#EF4444"}}>{this.stats().mistypes}</span></p>
-            //   <p>正確率: <span style={{"color": "#3B82F6"}}>
-            //     {this.stats().correctTypes + this.stats().mistypes > 0 
-            //       ? Math.round((this.stats().correctTypes / (this.stats().correctTypes + this.stats().mistypes)) * 100)
-            //       : 0}%
-            //   </span></p>
-            // </div>
-          // </div>
+          </div>
         )}
 
         <div style={{
           "background": "#0f0f0f",
           "border-radius": "8px",
-          "padding": "20px",
-          "border": "2px solid #333",
+          // "padding": "20px",
+          "border": "20px solid #333",
+          "border-color": "#333",
           "min-height": "400px",
           "position": "relative"
-
         }}>
           {this.MiddleCanvas()}
         </div>
-
-        {this.gameStarted() && !this.gameEnded() && (
-          <div style={{
-            "margin-top": "20px",
-            "text-align": "center",
-            "font-size": "14px",
-            "color": "#888888",
-          }}>
-            <p>現在の文字をタイプしてください</p>
-            <p>緑: 入力済み | 黄: 現在位置 | 白: 未入力</p>
-          </div>
-        )}
       </div>
     </>
   }
