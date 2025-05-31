@@ -3,7 +3,7 @@ import SceneBase from "./fundation/sceneBase";
 import type SceneManager from "./fundation/sceneManager";
 import { Container, Application as PixiApp } from 'pixi.js';
 import SceneSig from "./fundation/signatures";
-import type IUserDataManager from "../data_interface/user_data/interface"; // 追加！
+import { userDataManager } from "../const";
 
 export default class RecordScene extends SceneBase {
     private pixiApp!: PixiApp;
@@ -12,7 +12,7 @@ export default class RecordScene extends SceneBase {
     private CorrectType: number=0;
 
     // ✅ データマネージャーを受け取る
-    constructor(manager: SceneManager, private userDataManager: IUserDataManager) {
+    constructor(manager: SceneManager) {
         super(manager, SceneSig.record);
     }
 
@@ -20,8 +20,8 @@ export default class RecordScene extends SceneBase {
     async preload(): Promise<void> {
         console.log(`Preloading ${this.sceneSignature}...`);
 
-        const summary = await this.userDataManager.getRecordSummary();
-        this.bestScore = summary.bestScore;
+        const summary = await userDataManager.getRecordSummary();
+        this.bestScore = summary.bestWPM;
         this.totalType = summary.totalTypeCount;
 
         const pixiApp = new PixiApp();

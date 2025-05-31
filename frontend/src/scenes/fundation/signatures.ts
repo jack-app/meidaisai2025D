@@ -3,7 +3,6 @@ enum SceneSig {
     example,
     explanation,
     game,
-    login,
     record,
     result,
     selection,
