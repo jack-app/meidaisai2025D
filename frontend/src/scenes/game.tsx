@@ -6,6 +6,7 @@ import SceneSig from "./fundation/signatures";
 import styles from "./game.module.css";
 import { type GameStats } from "../data_interface/user_data/types";
 import { userDataManager, Host } from "../const.ts";
+import metype from "/images/METYPE.png";
 
 // 問題データの型定義
 interface Problem {
@@ -298,8 +299,8 @@ export default class GameScene extends SceneBase {
     const viewportWidth = this.pixiApp.renderer.width;
     const scrollOffsetX = Math.max(0, currentPositionX - viewportWidth / 2);
 
-    this.textContainer.x = -scrollOffsetX + 40;
-    this.backgroundContainer.x = -scrollOffsetX + 40;
+    this.textContainer.x = -scrollOffsetX + 20;
+    this.backgroundContainer.x = -scrollOffsetX + 20;
 
   }
 
@@ -327,7 +328,7 @@ MiddleCanvas(): JSXElement {
   return (
     <div
       ref={el => containerDiv = el!}
-      style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden' }}
+      style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden'}}
     />
   );
 }
@@ -361,7 +362,7 @@ MiddleCanvas(): JSXElement {
   }
 
     // コンテンツを中央に配置
-    const padding = 40;
+    const padding = 0;
     contentContainer.x = padding;
     // contentContainer.y = padding;
     this.updateDisplay();
@@ -372,7 +373,7 @@ MiddleCanvas(): JSXElement {
     return <>
       <div class={styles.whole}>
         <div class={styles.whole2}>
-          <h1 class={styles.title}>metype</h1>
+          <img src={metype} style={{"height": "12vh", "border-radius": "8px"}}/>
           <div class={styles.situation}>
             <div class={styles.situationExplain}>
               <div class={styles.situationExplainTag}>正解</div>
@@ -451,8 +452,9 @@ MiddleCanvas(): JSXElement {
         <div style={{
           "background": "#0f0f0f",
           "border-radius": "8px",
-          "padding": "20px",
-          "border": "2px solid #333",
+          // "padding": "20px",
+          "border": "20px solid #333",
+          "border-color": "#333",
           "min-height": "400px",
           "position": "relative"
         }}>

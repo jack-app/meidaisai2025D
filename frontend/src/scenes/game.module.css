@@ -5,9 +5,10 @@ html {
 .whole {
     background: #333;
     color: #eee;
-    height: 100vh;
-    width: 100vw;
-    padding: 20px;
+    height: 100%;
+    width: 100%;
+    padding-top: 20px;
+    position: relative;
 }
 
 .whole2 {
@@ -15,9 +16,9 @@ html {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    padding: 10px 20px;
     background: #2a2a2a;
-    border-radius: 8px
+    /* border-radius: 8px; */
+    margin:0px 20px 20px 20px;
 }
 .title {
     margin:  0;
