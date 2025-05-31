@@ -1,12 +1,14 @@
-:root {
+html {
     font-family: 'Consolas', 'monospace', 'Yu gothic';
 }
 
 .whole {
     background: #333;
     color: #eee;
-    min-height: 100vh;
-    padding: 20px;
+    height: 100%;
+    width: 100%;
+    padding-top: 20px;
+    position: relative;
 }
 
 .whole2 {
@@ -14,9 +16,9 @@
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    padding: 10px 20px;
     background: #2a2a2a;
-    border-radius: 8px
+    /* border-radius: 8px; */
+    margin:0px 20px 20px 20px;
 }
 .title {
     margin:  0;
@@ -65,7 +67,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: flex-start;
+    align-content: flex-start;
     padding-left: 50px;
     background-color: #333;
 }
@@ -87,14 +89,14 @@
 }
 .textStyle {
   font-size: clamp(16px, 4vw, 48px);
-  /* font-weight: bold; */
-  color: #007ACC;
+  font-weight: bold;
+  color: #eee;
   padding-left: 25px;
 }
 .outerButton {
   display: flex;
   justify-content: center;
-  align-items: start;
+  align-items: flex-start;
   height: 20%;
   background-color: #333;
 }
@@ -120,4 +122,13 @@
 
 .homeButton span {
   color: #FF00FF;
+}
+.key{
+  text-align: center;
+  color: #9d9fcc;
+  padding: 5px;
+  border: 1px solid #333;
+  border-radius: 10px;
+  box-shadow: 4px 4px 8px #1d1d1d, -4px -4px 8px #555;
+  background-color: #333;
 }

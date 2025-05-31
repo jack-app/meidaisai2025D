@@ -5,18 +5,20 @@ import { Container, Application as PixiApp, Text, TextStyle, Graphics } from 'pi
 import SceneSig from "./fundation/signatures";
 import styles from "./game.module.css";
 import { type GameStats } from "../data_interface/user_data/types";
-import { userDataManager } from "../const.ts";
+import { userDataManager, Host } from "../const.ts";
+import metype from "/images/METYPE.png";
 
-import { SourceCode, SourceCodeInstances } from "../game_data/problems.ts";
+import { Problem } from "../game_data/problems.ts";
+import SourceCodeInstances from "../game_data/instances.ts";
 
 // ゲームデータプロバイダーのモック
 class GameDataProvider {
-  static getProblem(): SourceCode {
+  static getProblem(): Problem {
     // ProblemInstancesからランダムに問題を取得して返す．
     return SourceCodeInstances[
       Math.floor(Math.random() * SourceCodeInstances.length)
       % SourceCodeInstances.length
-    ];
+    ].generateProblem();
   }
 }
 
@@ -29,7 +31,8 @@ export default class GameScene extends SceneBase {
     super(manager, SceneSig.game);
   }
   private pixiApp!: PixiApp;
-  private problemData!: SourceCode;
+  private problemData!: Problem;
+  /** @deprecated problemDataが現在位置の情報を持つようになったためdeprecated */
   private currentPosition = 0;
   private textContainer!: Container;
   private backgroundContainer!: Container;
@@ -59,27 +62,6 @@ export default class GameScene extends SceneBase {
     console.log(`Preloading ${this.sceneSignature}...`);
 
     const pixiApp = new PixiApp();
-    
-    // await Promise.all([
-    //   (async () => {
-    //     // 問題データの読み込み
-    //     console.log("loading problem data ")
-    //     this.problemData = GameDataProvider.getMockProblem();
-    //     console.log(this.problemData)
-    //     console.log("loaded problem data ")
-    //   })(),
-      
-    //   (async () => {
-    //     // その他の初期化処理
-    //     this.currentPosition = 0;
-    //   })(),
-      
-    //   // PixiAppの初期化
-    //   pixiApp.init({ 
-    //     backgroundAlpha: 0 
-    //   }),
-    // ]);
-
     await pixiApp.init({ 
       backgroundAlpha: 0 
     })
@@ -88,11 +70,6 @@ export default class GameScene extends SceneBase {
       (async () => {
         // 問題データの読み込み
         this.problemData = GameDataProvider.getProblem();
-      })(),
-      
-      (async () => {
-        // その他の初期化処理
-        this.currentPosition = 0;
       })(),
     ]);
     this.pixiApp = pixiApp;
@@ -115,8 +92,8 @@ export default class GameScene extends SceneBase {
       
       this.setStats(prev => ({
         ...prev,
-        timeRemaining: prev.timeRemaining - 1
-                // timeRemaining: prev.timeRemaining 
+        // timeRemaining: prev.timeRemaining - 6
+                timeRemaining: prev.timeRemaining 
       }));
       this.setStats(prev => ({
         ...prev,
@@ -147,23 +124,22 @@ export default class GameScene extends SceneBase {
     }
 
     // 特殊キーは無視
-    if (event.key.length > 1 && event.key !== 'Tab') return;
+    if (event.key.length > 1 && event.key !== 'Tab' || event.key ===' ') return;
     
     event.preventDefault();
     
-    const targetChar = this.problemData.content[this.currentPosition];
+    const targetChar = this.problemData.charAtCursor();
     
     if (event.key === targetChar) {
       // 正解
-      this.currentPosition++;
+      this.problemData.proceed();
       this.setStats(prev => ({
         ...prev,
         correctTypes: prev.correctTypes + 1
       }));
-
       
       // 問題完了チェック
-      if (this.currentPosition >= this.problemData.content.length) {
+      if (this.problemData.completed) {
         this.endGame(this.statsSignal[0]());
       }
     } else {
@@ -181,6 +157,38 @@ export default class GameScene extends SceneBase {
     this.updateDisplay();
   }
 
+
+  private readonly fontSize = 20;
+  private readonly lineHeight = 24;
+  private readonly charWidth = 12;
+
+  // 文字の表示処理
+  private putCharAt(x: number, y: number, char: string, backgroundColor: number, textColor: number): void {
+    // 背景矩形
+    if (backgroundColor !== 0x000000) {
+      const bg = new Graphics();
+      bg.rect(x - 2, y - 2, this.charWidth, this.lineHeight);
+      bg.fill(backgroundColor);
+      this.backgroundContainer.addChild(bg);
+    }
+    
+    // 文字
+
+    const style = new TextStyle({
+      fontFamily: 'Consolas',
+      fontSize: this.fontSize,
+      fill: textColor,
+    });
+
+    const text = new Text(char, style);
+    text.x = x;
+    text.y = y;
+    this.textContainer.addChild(text);
+  }
+
+  private readonly firstLetterPosX = 20;
+  private readonly firstLinePosY = 20;  
+
   // 表示更新
   private updateDisplay(): void {
     console.log(`updating display ${this.sceneSignature}...`);
@@ -191,67 +199,66 @@ export default class GameScene extends SceneBase {
     this.backgroundContainer.removeChildren();
     
     console.log(this.problemData)
-    const content = this.problemData.content;
-    const fontSize = 20;
-    const lineHeight = 24;
-    const charWidth = 12;
     
-    let currentX = 20;
-    let currentY = 20;
-    
-    for (let i = 0; i < content.length; i++) {
-      const char = content[i];
-      
-      // 改行処理
-      if (char === '\n') {
-        currentX = 20;
-        currentY += lineHeight;
-        continue;
-      }
-      
-      // 文字の背景色を決定
-      let backgroundColor = 0x000000; // デフォルト（透明）
-      let textColor = 0xFFFFFF; // 白
-      
-      if (i < this.currentPosition) {
-        // 入力済み（緑）
-        backgroundColor = 0x22C55E;
-        textColor = 0x000000;
-      } else if (i === this.currentPosition) {
-        // 現在位置（黄色）
-        backgroundColor = 0xEAB308;
-        textColor = 0x000000;
-      }
-      
-      // 背景矩形
-      if (backgroundColor !== 0x000000) {
-        const bg = new Graphics();
-        bg.rect(currentX - 2, currentY - 2, charWidth, lineHeight);
-        bg.fill(backgroundColor);
-        this.backgroundContainer.addChild(bg);
-      }
-      
-      // 文字
+    let currentX = this.firstLetterPosX;
+    let currentY = this.firstLinePosY;
 
-      const style = new TextStyle({
-        fontFamily: 'Consolas',
-        fontSize: fontSize,
-        fill: textColor,
-      });
+    // ProblemDataから現在位置より前の文字を取得
+    for (const token of this.problemData.tokensBeforeCursor()) {
+      for (const char of token.content) {
+        // 改行処理
+        if (char === '\n') {
+          currentX = this.firstLetterPosX;
+          currentY += this.lineHeight;
+          continue;
+        }
+        // 文字の背景色を決定
+        const backgroundColor = 0x22C55E; // 緑
+        const textColor = 0x000000; // 黒
+        this.putCharAt(currentX, currentY, char, backgroundColor, textColor);
+        currentX += this.charWidth;
+      }
+    }
 
-      const text = new Text(char, style);
-      text.x = currentX;
-      text.y = currentY;
-      this.textContainer.addChild(text);
-      
-      currentX += charWidth;
-      if (this.problemData.content[this.currentPosition] === "\n"){
-        this.currentPosition += 1;
+    // 現在入力位置を記録
+    const curosrPositionX = currentX;
+    const cursorPositionY = currentY;
+    // 現在の文字を取得 改行は取得され得ないので，改行処理は入れない．
+    {
+      const backgroundColor = 0xEAB308; // 黄色
+      const textColor = 0xeeeeee; // 灰色
+      const currentChar = this.problemData.charAtCursor();
+      this.putCharAt(currentX, currentY, currentChar, backgroundColor, textColor);
+      currentX += this.charWidth;
+    }
+
+    for (const token of this.problemData.tokensAfterCursor()) {
+      for (const char of token.content) {
+        // 改行処理
+        if (char === '\n') {
+          currentX = this.firstLetterPosX;
+          currentY += this.lineHeight;
+          continue;
+        }
+        const backgroundColor = 0x000000; // 透明
+        const textColor = 0xFFFFFF; // 白
+        this.putCharAt(currentX, currentY, char, backgroundColor, textColor);
+        currentX += this.charWidth;
       }
-      if (this.currentPosition === content.length) {
-        this.endGame(this.statsSignal[0]());
-      }
-    }    
+    }
+
+    const viewportHeight = this.pixiApp.renderer.height;
+    const scrollOffsetY = Math.max(0, cursorPositionY - viewportHeight / 2);
+
+    this.textContainer.y = -scrollOffsetY + 40;
+    this.backgroundContainer.y = -scrollOffsetY + 40;
+
+    const viewportWidth = this.pixiApp.renderer.width;
+    const scrollOffsetX = Math.max(0, curosrPositionX - viewportWidth / 2);
+
+    this.textContainer.x = -scrollOffsetX + 20;
+    this.backgroundContainer.x = -scrollOffsetX + 20;
+
   }
 
 MiddleCanvas(): JSXElement {
@@ -278,7 +285,7 @@ MiddleCanvas(): JSXElement {
   return (
     <div
       ref={el => containerDiv = el!}
-      style={{ height: '100%', width: '100%', position: 'relative' }}
+      style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden'}}
     />
   );
 }
@@ -306,10 +313,16 @@ MiddleCanvas(): JSXElement {
       canvasHolder.clientHeight
     );
     
+  if (this.pixiApp.canvas) {
+    this.pixiApp.canvas.style.width = '100%';
+    this.pixiApp.canvas.style.height = '100%';
+  }
+
     // コンテンツを中央に配置
-    const padding = 40;
+    const padding = 0;
     contentContainer.x = padding;
-    contentContainer.y = padding;
+    // contentContainer.y = padding;
+    this.updateDisplay();
   }
 
   // コンポーネントを作成する
@@ -317,7 +330,7 @@ MiddleCanvas(): JSXElement {
     return <>
       <div class={styles.whole}>
         <div class={styles.whole2}>
-          <h1 class={styles.title}>metype</h1>
+          <img src={metype} style={{"height": "12vh", "border-radius": "8px"}}/>
           <div class={styles.situation}>
             <div class={styles.situationExplain}>
               <div class={styles.situationExplainTag}>正解</div>
@@ -355,10 +368,13 @@ MiddleCanvas(): JSXElement {
         {!this.gameStarted() && !this.gameEnded() && (
           <div class={styles.start}>
               <div class={styles.startText}>
-                <p>Press Enter to start</p>
+                <h3>Enterを押してゲームを開始して下さい</h3>
               </div>
               <div class={styles.startText}>
-                <p>Time limit: {this.stats().totalTime}seconds</p>
+                <h3>制限時間：{this.stats().totalTime}秒</h3>
+              </div>
+              <div class={styles.startText}>
+                <p>ゲーム中、<span class={styles.key}>Space</span>・<span class={styles.key}>Enter</span>キーを押す必要はありません</p>
               </div>
           </div>
         )}
@@ -369,19 +385,16 @@ MiddleCanvas(): JSXElement {
             <div class={styles.containerStyle}>
                 <div class={styles.resultStyle}> &lt;Result&gt; </div>
                 <div>
-                    <div class={styles.textStyle}> 正解タイプ数 = <span style={{"color": "#22C55E"}}>{this.stats().correctTypes}</span></div>
+                    <div class={styles.textStyle}> correct = <span style={{"color": "#22C55E"}}>{this.stats().correctTypes} </span>byte</div>
                 </div>
                 <div>
-                    <div class={styles.textStyle}> ミスタイプ数 = <span style={{"color": "#22C55E"}}>{this.stats().mistypes}</span></div>
+                    <div class={styles.textStyle}> miss = <span style={{"color": "#22C55E"}}>{this.stats().mistypes} </span>byte</div>
                 </div>
                 <div>
-                    <div class={styles.textStyle}> 正解率 = <span style={{"color": "#22C55E"}}>{this.stats().correctRate}</span></div>
+                    <div class={styles.textStyle}> correctRate = <span style={{"color": "#22C55E"}}>{this.stats().correctRate} </span>%</div>
                 </div>
                 <div>
                     <div class={styles.textStyle}> WPM = <span style={{"color": "#22C55E"}}>{this.stats().wpm}</span></div>
-                </div>
-                <div>
-                    <div class={styles.textStyle}> score = <span style={{"color": "#22C55E"}}>100点満点</span></div>
                 </div>
                 <div class={styles.resultStyle}> &lt;/Result&gt; </div>
             </div>
@@ -390,46 +403,20 @@ MiddleCanvas(): JSXElement {
                     <span>return</span> home;
                 </button>
             </div>
-            </div>
-          
-          // <div class={styles.end}>
-            // <h2 style={{"color": "#EAB308"}}>ゲーム終了！</h2>
-            // <p style={{"color": "#EAB308"}}>Enterキーを押して次の画面に進んでください</p>
-            // <div style={{"margin": "20px 0"}}>
-            //   <p>正解タイプ数: <span style={{"color": "#22C55E"}}>{this.stats().correctTypes}</span></p>
-            //   <p>ミスタイプ数: <span style={{"color": "#EF4444"}}>{this.stats().mistypes}</span></p>
-            //   <p>正確率: <span style={{"color": "#3B82F6"}}>
-            //     {this.stats().correctTypes + this.stats().mistypes > 0 
-            //       ? Math.round((this.stats().correctTypes / (this.stats().correctTypes + this.stats().mistypes)) * 100)
-            //       : 0}%
-            //   </span></p>
-            // </div>
-          // </div>
+          </div>
         )}
 
         <div style={{
           "background": "#0f0f0f",
           "border-radius": "8px",
-          "padding": "20px",
-          "border": "2px solid #333",
+          // "padding": "20px",
+          "border": "20px solid #333",
+          "border-color": "#333",
           "min-height": "400px",
           "position": "relative"
-
         }}>
           {this.MiddleCanvas()}
         </div>
-
-        {this.gameStarted() && !this.gameEnded() && (
-          <div style={{
-            "margin-top": "20px",
-            "text-align": "center",
-            "font-size": "14px",
-            "color": "#888888",
-          }}>
-            <p>現在の文字をタイプしてください</p>
-            <p>緑: 入力済み | 黄: 現在位置 | 白: 未入力</p>
-          </div>
-        )}
       </div>
     </>
   }

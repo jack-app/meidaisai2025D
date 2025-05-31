@@ -1,23 +1,16 @@
 import hljs from "highlight.js";
 
-// highlight.jsの字句解析情報を利用するためのhack
-type SerialToken = {
-    children: string[];
-    scope: string;
-} | string;
-type TokenTreeEmitter = {rootNode: {children: SerialToken[]}};
-
 export enum Scope {
-  PLANE, //独自スコープ
-  string,
-  keyword,
-  type,
-  symbol,
-  variable,
-  classTitle,
-  functionTitle,
-  params,
-  comment,
+  PLANE = "plane", //独自スコープ
+  string = "string",
+  keyword = "keyword",
+  type = "type",
+  symbol = "symbol",
+  variable = "variable",
+  classTitle = "classTitle",
+  functionTitle = "functionTitle",
+  params = "params",
+  comment = "comment",
 }
 
 // (highlight.jsのscope) string -> 独自scope (enum)
@@ -25,6 +18,7 @@ function scopeAsEnum(scope: string): Scope {
 // 参考: 
 // https://highlightjs.readthedocs.io/en/latest/css-classes-reference.html
    switch (scope) {
+  // 通常のソース
   case "string": return Scope.string;
   case "keyword": return Scope.keyword;
   case "built_in": return Scope.functionTitle;
@@ -49,7 +43,14 @@ function scopeAsEnum(scope: string): Scope {
   case "params": return Scope.params;
   case "comment": return Scope.comment;
   case "doctag": return Scope.comment;
-  default: return Scope.PLANE; // デフォルトはPLANE
+  // XML
+  case "language:xml": return Scope.PLANE;
+  case "tag": return Scope.PLANE;
+  case "name": return Scope.classTitle;
+  case "attr": return Scope.variable;
+  default: 
+    console.warn(`unhandled scope: ${scope}`);
+    return Scope.PLANE; // デフォルトはPLANE
   }
 }
 
@@ -66,25 +67,40 @@ export class Token {
   }
 }
 
+// highlight.jsの字句解析情報を利用するためのhack
+type SerialToken = {
+    children: SerialToken[];
+    scope: string;
+} | string;
+type TokenTreeEmitter = {rootNode: {children: SerialToken[]}};
+
+
 // 問題データの型定義
 export class SourceCode {
   public tokens: Token[];
+  
   constructor(public id: string, public content: string, public language: string) {
     // ちょっとhackyすぎ？
     const tokenTree = hljs.highlight(content, { language })._emitter as unknown as TokenTreeEmitter;
     this.tokens = [];
     for (const token of tokenTree.rootNode.children) {
-      // highlight.jsのscope -> 独自のScope(上で定めたもの)へ
-      if (typeof token === "string") {
-        this.tokens.push(new Token(token, Scope.PLANE));
-      } else {
-        this.tokens.push(new Token(
-          token.children.join(""), 
-          scopeAsEnum(token.scope)
-        ));
-      }
+      this.pushToken(token);
     }
   }
+
+  // flattenのため再帰関数を使用
+  private pushToken(token: SerialToken, superScope?: Scope) {
+    // highlight.jsのscope -> 独自のScope(上で定めたもの)へ
+    if (typeof token === "string") {
+      this.tokens.push(new Token(token, superScope || Scope.PLANE));
+      return;
+    }
+
+    for (const child of token.children) {
+      this.pushToken(child, scopeAsEnum(token.scope));
+    }
+  }
+
   generateProblem(): Problem {
     return new Problem(this);
   }
@@ -185,46 +201,3 @@ export class Problem {
     ]
   }
 }
-
-export const SourceCodeInstances: SourceCode[] = [
-  new SourceCode(
-    "sample1",
-`import { createSignal, Show } from 'solid-js'
-import FixedAspectRatio from './components/fixedAspectRatio'
-
-import type SceneBase from './scenes/fundation/sceneBase'
-
-import LoadingScene from './scenes/loading'
-import instanciateAllScenes from './scenes/fundation/instanciate'
-import SceneSig from './scenes/fundation/signatures'
-// 全シーンで共通のSceneManagerを使用する．
-import { sceneManager } from './const'
-
-function ViewRoot() {
-
-  // 共通のシーンマネージャでシーンを実体化する．
-  // ローディングシーンだけ特殊なので別枠でインスタンス化しておく．
-  const loadingScene = new LoadingScene(sceneManager)
-  instanciateAllScenes(sceneManager)
-
-  // シーンマネージャーがシーンを切り替えれるように設定する．
-  const [getScene, setScene] = createSignal<SceneBase>();
-  sceneManager.bindSceneChangeCallback(setScene);
-  
-  // 以下表示する内容
-  return (
-    <FixedAspectRatio width={1600} height={900}>
-      <Show 
-        when={getScene()} 
-        fallback={loadingScene.makeComponent()}
-      >
-          {getScene()!.makeComponent()}
-      </Show>
-    </FixedAspectRatio>
-  )
-}
-
-export default ViewRoot`,
-    "typescript",
-  )
-]

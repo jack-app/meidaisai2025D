@@ -1,7 +1,7 @@
 import { onMount, type JSXElement } from "solid-js";
 import SceneBase from "./fundation/sceneBase";
 import type SceneManager from "./fundation/sceneManager";
-import { Container, Application as PixiApp } from 'pixi.js';
+import { Container, Application as PixiApp } from "pixi.js";
 import SceneSig from "./fundation/signatures";
 import { userDataManager } from "../const";
 
@@ -9,62 +9,55 @@ export default class RecordScene extends SceneBase {
     private pixiApp!: PixiApp;
     private bestScore: number = 0;
     private totalType: number = 0;
+    private CorrectType: number=0;
 
-    // ✅ データマネージャーを受け取る
-    constructor(manager: SceneManager) {
-        super(manager, SceneSig.record);
-    }
+  // ✅ データマネージャーを受け取る
+  constructor(manager: SceneManager) {
+    super(manager, SceneSig.record);
+  }
 
-    // ✅ 記録データを読み込む
-    async preload(): Promise<void> {
-        console.log(`Preloading ${this.sceneSignature}...`);
+  // ✅ 記録データを読み込む
+  async preload(): Promise<void> {
+    console.log(`Preloading ${this.sceneSignature}...`);
 
-        const summary = await userDataManager.getRecordSummary();
-        this.bestScore = summary.bestWPM;
-        this.totalType = summary.totalTypeCount;
+    const summary = await userDataManager.getRecordSummary();
+    this.bestScore = summary.bestWPM;
+    this.totalType = summary.totalTypeByte;
 
-        const pixiApp = new PixiApp();
-        await pixiApp.init({ backgroundAlpha: 0 });
-        this.pixiApp = pixiApp;
-    }
+    const pixiApp = new PixiApp();
+    await pixiApp.init({ backgroundAlpha: 0 });
+    this.pixiApp = pixiApp;
+  }
 
-    
-    MiddleCanvas(): JSXElement {
-        const pixiContainer = this.makePixiAppContent();
-        const canvasHolder = <div style={{ height: '100%', width: '100%' }}>
-            {this.pixiApp.canvas}
-        </div> as HTMLElement;
+  MiddleCanvas(): JSXElement {
+    const pixiContainer = this.makePixiAppContent();
+    const canvasHolder = (
+      <div style={{ height: "100%", width: "100%" }}>{this.pixiApp.canvas}</div>
+    ) as HTMLElement;
 
-
-      
-        onMount(() => {
- 
+    onMount(() => {
+      this.arrangeContent(pixiContainer, canvasHolder);
+      window.addEventListener("resize", () => {
         this.arrangeContent(pixiContainer, canvasHolder);
-            window.addEventListener('resize', () => {
-                this.arrangeContent(pixiContainer, canvasHolder);
-            });
-        });
+      });
+    });
 
-        return canvasHolder;
-    }
+    return canvasHolder;
+  }
 
+  makePixiAppContent() {
+    const container = new Container();
 
-    makePixiAppContent() {
-        const container = new Container();    
- 
- 
-        this.pixiApp.stage.addChild(container);
-        return container;
-    }
+    this.pixiApp.stage.addChild(container);
+    return container;
+  }
 
- 
-    arrangeContent(contentContainer: Container, canvasHolder: HTMLElement) {
-        this.pixiApp.renderer.resize(
-            canvasHolder.clientWidth, 
-            canvasHolder.clientHeight
-        );
-   
-    }
+  arrangeContent(contentContainer: Container, canvasHolder: HTMLElement) {
+    this.pixiApp.renderer.resize(
+      canvasHolder.clientWidth,
+      canvasHolder.clientHeight
+    );
+  }
 
     // ✅ 記録を表示する
     makeComponent(): JSXElement {
@@ -84,50 +77,40 @@ export default class RecordScene extends SceneBase {
         </div>
             <p style={{
                 "font-weight":'bold',
-                "font-size":'11vh',
+                "font-size":'12vh',
                 "color":'white',
                 "position":'absolute',
                 "top":'-5vh',
                 "left":'10vw', 
             }}>
                 <span style="color:#00CA82">1</span>&nbsp;&lt;Record&gt;
-            </p>  
+            </p>     
             <p style={{
                 "font-weight":'bold',
-                "font-size":'11vh',
+                "font-size":'12vh',
                 "color":'white',
                 "position":'absolute',
-                "top":'8vh',
+                "top":'11vh',
                 "left":'10vw', 
             }}>
-                <span style="color:#00CA82">1</span>&nbsp;&lt;Record&gt;
-            </p>      
-            <p style={{
-                "font-weight":'bold',
-                "font-size":'11vh',
-                "color":'white',
-                "position":'absolute',
-                "top":'22vh',
-                "left":'10vw', 
-            }}>
-                <span style="color:#00CA82">2</span>&nbsp;&nbsp;&nbsp;best_score = {this.bestScore}
+                <span style="color:#00CA82">2</span>&nbsp;&nbsp;&nbsp;<span style="color:#1E7FFC">best_score</span> = {this.bestScore} ;
             </p> 
             <p style={{
                 "font-weight":'bold',
-                "font-size":'11vh',
+                "font-size":'12vh',
                 "color":'white',
                 "position":'absolute',
-                "top":'37vh',
+                "top":'27vh',
                 "left":'10vw',
             }}>
-                <span style="color:#00CA82">3</span>&nbsp;&nbsp;&nbsp;total_type = {this.totalType} 
+                <span style="color:#00CA82">3</span>&nbsp;&nbsp;&nbsp;<span style="color:#1E7FFC">total_type</span> = {this.totalType} ;
             </p>  
             <p style={{
                 "font-weight":'bold',
-                "font-size":'11vh',
+                "font-size":'12vh',
                 "color":'white',
                 "position":'absolute',
-                "top":'52vh',
+                "top":'43vh',
                 "left":'10vw',
             }}>
                <span style="color:#00CA82">4</span>&nbsp;&lt;/Record&gt;
