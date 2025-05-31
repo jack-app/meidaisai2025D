@@ -20,7 +20,7 @@ export default class RecordScene extends SceneBase {
         console.log(`Preloading ${this.sceneSignature}...`);
 
         const summary = await this.userDataManager.getRecordSummary();
-        this.bestScore = summary.bestScore;
+        this.bestScore = summary.bestWPM;
         this.totalType = summary.totalTypeCount;
 
         const pixiApp = new PixiApp();

@@ -1,5 +1,5 @@
 import { createStore } from "solid-js/store";
-import { GameStats, UserId, UserName, type RecordSummary, type UserSetting, type UserState } from "./types";
+import { type GameStats, UserId, UserName, type RecordSummary, type UserSetting, type UserState } from "./types";
 import type IUserDataManager from "./interface";
 
 export default class UserDataManagerMock implements IUserDataManager{
@@ -51,7 +51,7 @@ export default class UserDataManagerMock implements IUserDataManager{
 
     private summray: RecordSummary = {
         totalTypeCount: 1000,
-        bestScore: 100,
+        bestWPM: 100,
     }
     async getRecordSummary(): Promise<RecordSummary> {
         return this.summray;
@@ -60,8 +60,8 @@ export default class UserDataManagerMock implements IUserDataManager{
     private lastRecord: GameStats | null = null;
     putRecord(record: GameStats): void {
         this.lastRecord = record;
-        this.summray.totalTypeCount += record.correctTypeCount;
-        this.summray.bestScore = Math.max(this.summray.bestScore, record.score);
+        this.summray.totalTypeCount += record.correctTypes;
+        this.summray.bestWPM = Math.max(this.summray.bestWPM, record.wpm);
     }
 
     getLastRecord(): GameStats {
