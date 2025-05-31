@@ -19,7 +19,7 @@ function ViewRoot() {
   // シーンマネージャーがシーンを切り替えれるように設定する．
   const [getScene, setScene] = createSignal<SceneBase>();
   sceneManager.bindSceneChangeCallback(setScene);
- sceneManager.changeSceneTo(SceneSig.record)
+  
   // 以下表示する内容
   return (
     <FixedAspectRatio width={1600} height={900}>
