@@ -9,6 +9,7 @@ export default class RecordScene extends SceneBase {
     private pixiApp!: PixiApp;
     private bestScore: number = 0;
     private totalType: number = 0;
+    private CorrectType: number=0;
 
     // ✅ データマネージャーを受け取る
     constructor(manager: SceneManager, private userDataManager: IUserDataManager) {
@@ -84,50 +85,40 @@ export default class RecordScene extends SceneBase {
         </div>
             <p style={{
                 "font-weight":'bold',
-                "font-size":'11vh',
+                "font-size":'12vh',
                 "color":'white',
                 "position":'absolute',
                 "top":'-5vh',
                 "left":'10vw', 
             }}>
                 <span style="color:#00CA82">1</span>&nbsp;&lt;Record&gt;
-            </p>  
+            </p>     
             <p style={{
                 "font-weight":'bold',
-                "font-size":'11vh',
+                "font-size":'12vh',
                 "color":'white',
                 "position":'absolute',
-                "top":'8vh',
+                "top":'11vh',
                 "left":'10vw', 
             }}>
-                <span style="color:#00CA82">1</span>&nbsp;&lt;Record&gt;
-            </p>      
-            <p style={{
-                "font-weight":'bold',
-                "font-size":'11vh',
-                "color":'white',
-                "position":'absolute',
-                "top":'22vh',
-                "left":'10vw', 
-            }}>
-                <span style="color:#00CA82">2</span>&nbsp;&nbsp;&nbsp;best_score = {this.bestScore}
+                <span style="color:#00CA82">2</span>&nbsp;&nbsp;&nbsp;<span style="color:#1E7FFC">best_score</span> = {this.bestScore} ;
             </p> 
             <p style={{
                 "font-weight":'bold',
-                "font-size":'11vh',
+                "font-size":'12vh',
                 "color":'white',
                 "position":'absolute',
-                "top":'37vh',
+                "top":'27vh',
                 "left":'10vw',
             }}>
-                <span style="color:#00CA82">3</span>&nbsp;&nbsp;&nbsp;total_type = {this.totalType} 
+                <span style="color:#00CA82">3</span>&nbsp;&nbsp;&nbsp;<span style="color:#1E7FFC">total_type</span> = {this.totalType} ;
             </p>  
             <p style={{
                 "font-weight":'bold',
-                "font-size":'11vh',
+                "font-size":'12vh',
                 "color":'white',
                 "position":'absolute',
-                "top":'52vh',
+                "top":'43vh',
                 "left":'10vw',
             }}>
                <span style="color:#00CA82">4</span>&nbsp;&lt;/Record&gt;
