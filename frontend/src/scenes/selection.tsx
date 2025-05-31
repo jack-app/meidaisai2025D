@@ -115,9 +115,13 @@ export default class SelectionScene extends SceneBase {
             "align-items": 'center',
             gap: '20px'
         }}>
-            {["設定", "遊び方", "スタート", "成績"].map(label => (
+            {[
+                {label: "設定", sig: SceneSig.setting}, 
+                {label:"遊び方", sig:SceneSig.explanation}, 
+                {label: "スタート", sig: SceneSig.game}, 
+                {label: "成績", sig: SceneSig.game}
+            ].map(({label, sig}) => (
                 <button style={{
-                
                     width: '400px',
                     padding: '20px',
                     "font-size": '20px',
@@ -125,7 +129,11 @@ export default class SelectionScene extends SceneBase {
                     color: 'black',
                     border: 'none',
                     "border-radius": '8px'
-                }}>
+                }}
+                onClick={() => {
+                    this.manager.changeSceneTo(sig);
+                }}
+                >
                     {label}
                 </button>
             ))}

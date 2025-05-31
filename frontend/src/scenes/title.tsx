@@ -3,10 +3,11 @@ import SceneBase from "./fundation/sceneBase";
 import type SceneManager from "./fundation/sceneManager";
 import { Container, Application as PixiApp } from 'pixi.js'
 import SceneSig from "./fundation/signatures";
+
+// ログイン処理はfirebase authを使う形に変更
 import type { CredentialResponse } from "google-one-tap";
 
-
-export {};
+// タイトルシーンとログインシーンは統合
 
 declare global {
   interface Window {
