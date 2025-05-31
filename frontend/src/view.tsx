@@ -5,7 +5,7 @@ import type SceneBase from './scenes/fundation/sceneBase'
 
 import LoadingScene from './scenes/loading'
 import instanciateAllScenes from './scenes/fundation/instanciate'
-
+import SceneSig from './scenes/fundation/signatures'
 // 全シーンで共通のSceneManagerを使用する．
 import { sceneManager } from './const'
 
@@ -19,7 +19,7 @@ function ViewRoot() {
   // シーンマネージャーがシーンを切り替えれるように設定する．
   const [getScene, setScene] = createSignal<SceneBase>();
   sceneManager.bindSceneChangeCallback(setScene);
-
+ sceneManager.changeSceneTo(SceneSig.record)
   // 以下表示する内容
   return (
     <FixedAspectRatio width={1600} height={900}>
