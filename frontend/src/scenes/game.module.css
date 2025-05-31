@@ -1,11 +1,12 @@
-:root {
+html {
     font-family: 'Consolas', 'monospace', 'Yu gothic';
 }
 
 .whole {
     background: #333;
     color: #eee;
-    min-height: 100vh;
+    height: 100vh;
+    width: 100vw;
     padding: 20px;
 }
 
@@ -87,8 +88,8 @@
 }
 .textStyle {
   font-size: clamp(16px, 4vw, 48px);
-  /* font-weight: bold; */
-  color: #007ACC;
+  font-weight: bold;
+  color: #eee;
   padding-left: 25px;
 }
 .outerButton {
@@ -120,4 +121,13 @@
 
 .homeButton span {
   color: #FF00FF;
+}
+.key{
+  text-align: center;
+  color: #9d9fcc;
+  padding: 5px;
+  border: 1px solid #333;
+  border-radius: 10px;
+  box-shadow: 4px 4px 8px #1d1d1d, -4px -4px 8px #555;
+  background-color: #333;
 }
