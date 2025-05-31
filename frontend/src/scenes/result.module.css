@@ -1,0 +1,57 @@
+:root {
+  font-size: 16px;
+  font-family: 'Consolas', 'monospace', 'Yu gothic';
+  width: 100%;
+  height: 100%;
+  /* background-color: #333; */
+}
+.containerStyle {
+  padding-left: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  height: 80%;
+  background-color: #333;
+
+}
+.resultStyle {
+  font-size: clamp(16px, 4vw, 48px);
+  font-weight: bold;
+  color: #eee;
+}
+.textStyle {
+  font-size: clamp(16px, 4vw, 48px);
+  font-weight: bold;
+  color: #007ACC;
+  padding-left: 25px;
+}
+.outerButton {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  height: 20%;
+  background-color: #333;
+}
+.homeButton {
+  width: 30vw;
+  min-width: 120px;
+  height: auto;
+  text-align: center;
+  color: #eee;
+  font-size: clamp(16px, 3vw, 48px);
+  font-weight: bold;
+  border: 1px solid #333;
+  border-radius: 10px;
+  box-shadow: 6px 6px 12px #1d1d1d, -6px -6px 12px #555;
+  background-color: #333;
+}
+.homeButton:hover {
+  border: none;
+}
+.homeButton:active {
+  box-shadow: inset 4px 4px 12px #111, inset -4px -4px 12px #555;
+}
+
+.homeButton span {
+  color: #FF00FF;
+}

@@ -1,9 +1,11 @@
 import { onMount, type JSXElement } from "solid-js";
 import SceneBase from "./fundation/sceneBase";
 import type SceneManager from "./fundation/sceneManager";
-import { Container, Application as PixiApp } from 'pixi.js'
+import { Container, Application as PixiApp } from 'pixi.js';
 import SceneSig from "./fundation/signatures";
-
+import  styles  from "./result.module.css";
+import stats from "./game.tsx"
+import GameScene from "./game.tsx";
 export default class ResultScene extends SceneBase {
     
     //
@@ -99,8 +101,24 @@ export default class ResultScene extends SceneBase {
 
     makeComponent(): JSXElement {
         return <>
-            ここでコンポーネントを作成する
-            ...
+            <div class={styles.containerStyle}>
+                <div class={styles.resultStyle}> &lt;Result&gt; </div>
+                <div>
+                    <div class={styles.textStyle}> correct = </div>
+                </div>
+                <div>
+                    <div class={styles.textStyle}> miss = </div>
+                </div>
+                <div>
+                    <div class={styles.textStyle}> score = </div>
+                </div>
+                <div class={styles.resultStyle}> &lt;/Result&gt; </div>
+            </div>
+            <div class={styles.outerButton}>
+                <button class={styles.homeButton} type="button" onclick={() => this.manager.changeSceneTo(SceneSig.game)}>
+                    <span>return</span> home;
+                </button>
+            </div>
         </>
     }
 }

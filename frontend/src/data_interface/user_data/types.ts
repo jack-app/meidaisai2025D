@@ -1,14 +1,10 @@
-export class GameRecord {
-    public readonly recordedAt: Date = new Date();
-    constructor(
-        public readonly correctTypeCount: number,
-        public readonly mistypeCount: number,
-        public readonly bonus: number = 0,
-    ) {}
-    
-    get score(): number {
-        return this.correctTypeCount - this.mistypeCount + this.bonus;
-    }
+export type GameStats = {
+  correctTypes: number,
+  mistypes: number,
+  correctRate: number,
+  timeRemaining: number,
+  wpm: number,
+  totalTime: number,
 }
 
 export type RecordSummary = {

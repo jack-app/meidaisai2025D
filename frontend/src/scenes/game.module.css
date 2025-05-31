@@ -1,0 +1,123 @@
+:root {
+    font-family: 'Consolas', 'monospace', 'Yu gothic';
+}
+
+.whole {
+    background: #333;
+    color: #eee;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.whole2 {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding: 10px 20px;
+    background: #2a2a2a;
+    border-radius: 8px
+}
+.title {
+    margin:  0;
+    color: #007ACC;
+}
+.situation {
+    display: flex;
+    gap: 20px;
+}
+.situationExplain {
+    text-align: center;
+}
+.situationExplainTag {
+    font-size: 12px;
+    color: #888;
+}
+.start{
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    padding: auto;
+    background: #2a2a2a;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.startText {
+    font-size: 2vw;
+    font-weight: bold;
+    color: #9d9fcc;
+}
+.end {
+    position: fixed;
+    z-index: 100;
+    top: 0;
+    left: 0;
+    height: 100%;
+    width: 100%;
+    text-align: center;
+    padding: auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    padding-left: 50px;
+    background-color: #333;
+}
+
+.containerStyle {
+  padding-left: 50px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  height: 80%;
+  background-color: #333;
+
+}
+.resultStyle {
+  font-size: clamp(16px, 4vw, 48px);
+  font-weight: bold;
+  color: #eee;
+}
+.textStyle {
+  font-size: clamp(16px, 4vw, 48px);
+  /* font-weight: bold; */
+  color: #007ACC;
+  padding-left: 25px;
+}
+.outerButton {
+  display: flex;
+  justify-content: center;
+  align-items: start;
+  height: 20%;
+  background-color: #333;
+}
+.homeButton {
+  width: 30vw;
+  min-width: 120px;
+  height: auto;
+  text-align: center;
+  color: #eee;
+  font-size: clamp(16px, 3vw, 48px);
+  font-weight: bold;
+  border: 1px solid #333;
+  border-radius: 10px;
+  box-shadow: 6px 6px 12px #1d1d1d, -6px -6px 12px #555;
+  background-color: #333;
+}
+.homeButton:hover {
+  border: none;
+}
+.homeButton:active {
+  box-shadow: inset 4px 4px 12px #111, inset -4px -4px 12px #555;
+}
+
+.homeButton span {
+  color: #FF00FF;
+}
