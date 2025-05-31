@@ -9,7 +9,7 @@ export type GameStats = {
 
 export type RecordSummary = {
     totalTypeCount: number;
-    bestScore: number;
+    bestWPM: number;
 }
 
 export type UserSetting = {

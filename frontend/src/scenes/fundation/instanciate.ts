@@ -2,7 +2,6 @@ import type SceneManager from "./sceneManager";
 import ExampleScene from "../example";
 import ExplanationScene from "../explanation";
 import GameScene from "../game";
-import LoginScene from "../login";
 import RecordScene from "../record";
 import SelectionScene from "../selection";
 import SettingScene from "../setting";
@@ -14,7 +13,6 @@ export default function instanciateAllScenes(manager: SceneManager) {
     new ExampleScene(manager);
     new ExplanationScene(manager);
     new GameScene(manager);
-    new LoginScene(manager);
     new RecordScene(manager);
     new ResultScene(manager);
     new SelectionScene(manager);
