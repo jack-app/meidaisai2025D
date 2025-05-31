@@ -1,4 +1,4 @@
-import type { GameRecord, RecordSummary, UserSetting, UserState } from "./types";
+import type { GameStats, RecordSummary, UserSetting, UserState } from "./types";
 
 export default interface IUserDataManager {
     useUserState(): UserState;
@@ -8,6 +8,6 @@ export default interface IUserDataManager {
 
     getRecordSummary(): Promise<RecordSummary>;
 
-    putRecord(record: GameRecord): void;
-    getLastRecord(): GameRecord;
+    putRecord(record: GameStats): void;
+    getLastRecord(): GameStats;
 }
