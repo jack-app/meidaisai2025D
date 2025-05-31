@@ -7,35 +7,16 @@ import styles from "./game.module.css";
 import { type GameStats } from "../data_interface/user_data/types";
 import { userDataManager } from "../const.ts";
 
-// 問題データの型定義
-interface Problem {
-  id: string;
-  content: string;
-  language: string;
-}
+import { type Problem, ProblemInstances } from "../game_data/problems.ts";
 
 // ゲームデータプロバイダーのモック
 class GameDataProvider {
-  static getMockProblem(): Problem {
-    return {
-      id: "sample_1",
-      content: `const greeting = "Hello, World!";
-
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-aaaaaaaaaaaaaa
-a
-aa
-
-a
-a
-aa
-
-a
-
-aaaaaaa
-`,
-      language: "typescript"
-    };
+  static getProblem(): Problem {
+    // ProblemInstancesからランダムに問題を取得して返す．
+    return ProblemInstances[
+      Math.floor(Math.random() * ProblemInstances.length)
+      % ProblemInstances.length
+    ];
   }
 }
 
@@ -106,7 +87,7 @@ export default class GameScene extends SceneBase {
     await Promise.all([
       (async () => {
         // 問題データの読み込み
-        this.problemData = GameDataProvider.getMockProblem();
+        this.problemData = GameDataProvider.getProblem();
       })(),
       
       (async () => {
