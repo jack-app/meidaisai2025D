@@ -28,12 +28,12 @@ export async function authMiddleware(req: Request, res: Response, next: Function
     }
 }
 
-function signup(req: Request, res: Response) {
+// function signup(req: Request, res: Response) {
 
-}
+// }
 
-function login(req: Request, res: Response) {
+// function login(req: Request, res: Response) {
 
-}
+// }
 
-export {signup, login}
+// export {signup, login}

@@ -31,7 +31,7 @@ async function getUserData(req: Request, res: Response) {
                 },
                 records: {
                     totalTypeByte: 0,
-                    bestByte: 0
+                    bestWPM: 0
                 }
             });
         }
@@ -88,21 +88,21 @@ async function addGameRecord(req: Request, res: Response) {
         const recordRef = await db.collection('users').doc(userId).collection('gameRecords').add(recordWithTimestamp);
 
         const userRef = db.collection('users').doc(userId);
-        let totalTypeByte, bestByte;
+        let totalTypeByte, bestWPM;
 
         await db.runTransaction(async (transaction) => {
             const userDoc = await transaction.get(userRef);
             const userData = userDoc.data() || {};
-            const currentRecords = userData.records || { totalTypeByte: 0, bestByte: 0 };
+            const currentRecords = userData.records || { totalTypeByte: 0, bestWPM: 0 };
 
             totalTypeByte = (currentRecords.totalTypeByte || 0) + gameRecord.correctTypeByte;
             const byte = gameRecord.correctTypeByte;
-            bestByte = Math.max(currentRecords.bestByte || 0, byte);
+            bestWPM = Math.max(currentRecords.bestWPM || 0, byte);
 
             transaction.set(userRef, {
                 records: {
                     totalTypeByte,
-                    bestByte
+                    bestWPM
                 }
             }, { merge: true });
         });
@@ -111,7 +111,7 @@ async function addGameRecord(req: Request, res: Response) {
             success: true,
             recordId: recordRef.id,
             totalTypeByte,
-            bestByte
+            bestWPM
         });
     } catch (error) {
         console.error('ゲーム記録の追加エラー:', error);
