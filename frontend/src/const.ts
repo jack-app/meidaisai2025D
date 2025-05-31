@@ -1,10 +1,7 @@
 import SceneManager from './scenes/fundation/sceneManager';
 import type IUserDataManager from './data_interface/user_data/interface';
-import type IGameDataProvider from './data_interface/game_data/interface';
 // import UserDataManager from './data_interface/user_data/userData';
-// import GameDataProvider from './data_interface/game_data/gameData';
 import UserDataManagerMock from './data_interface/user_data/mock';
-import GameDataProviderMock from './data_interface/game_data/mock';
 
 const host = new URL(location.href).host
 
@@ -19,7 +16,6 @@ if (isDev) {
 
 // Singleton
 export const userDataManager: IUserDataManager = new UserDataManagerMock()
-export const gameDataProvider: IGameDataProvider = new GameDataProviderMock()
 export const sceneManager = new SceneManager()
 
 // firebase
