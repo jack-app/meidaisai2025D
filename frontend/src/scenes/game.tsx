@@ -7,35 +7,16 @@ import styles from "./game.module.css";
 import { type GameStats } from "../data_interface/user_data/types";
 import { userDataManager } from "../const.ts";
 
-// 問題データの型定義
-interface Problem {
-  id: string;
-  content: string;
-  language: string;
-}
+import { SourceCode, SourceCodeInstances } from "../game_data/problems.ts";
 
 // ゲームデータプロバイダーのモック
 class GameDataProvider {
-  static getMockProblem(): Problem {
-    return {
-      id: "sample_1",
-      content: `const greeting = "Hello, World!";
-
-aaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-aaaaaaaaaaaaaa
-a
-aa
-
-a
-a
-aa
-
-a
-
-aaaaaaa
-`,
-      language: "typescript"
-    };
+  static getProblem(): SourceCode {
+    // ProblemInstancesからランダムに問題を取得して返す．
+    return SourceCodeInstances[
+      Math.floor(Math.random() * SourceCodeInstances.length)
+      % SourceCodeInstances.length
+    ];
   }
 }
 
@@ -48,7 +29,7 @@ export default class GameScene extends SceneBase {
     super(manager, SceneSig.game);
   }
   private pixiApp!: PixiApp;
-  private problemData!: Problem;
+  private problemData!: SourceCode;
   private currentPosition = 0;
   private textContainer!: Container;
   private backgroundContainer!: Container;
@@ -106,7 +87,7 @@ export default class GameScene extends SceneBase {
     await Promise.all([
       (async () => {
         // 問題データの読み込み
-        this.problemData = GameDataProvider.getMockProblem();
+        this.problemData = GameDataProvider.getProblem();
       })(),
       
       (async () => {

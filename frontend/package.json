@@ -12,10 +12,12 @@
   "dependencies": {
     "firebase": "^10.0.0",
     "firebaseui": "^6.1.0",
+    "highlight.js": "^11.11.1",
     "pixi.js": "^8.9.2",
     "solid-js": "^1.9.5"
   },
   "devDependencies": {
+    "jsdom": "^26.1.0",
     "typescript": "~5.8.3",
     "vite": "^6.3.5",
     "vite-plugin-solid": "^2.11.6",
