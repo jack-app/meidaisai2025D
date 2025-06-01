@@ -31,20 +31,18 @@ export async function allowCors(req: Request, res: Response, next: Function) {
     console.log('allowing cors access');
 
     if (
-        req.hostname === '127.0.0.1:5001'
+        req.headers.origin?.includes('127.0.0.1') 
+        || req.headers.origin?.includes('localhost') 
+        || req.headers.origin?.includes('metype-ffe25.web.app') 
+        || req.headers.origin?.includes('metype-ffe25.firebaseapp.com')
     ) {
-        res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:5000');
-        res.header('Access-Control-Allow-Methods', '*');
-        res.header('Access-Control-Allow-Headers', '*');
+        res.header('Access-Control-Allow-Origin', req.headers.origin);
     }
     
-    if (
-        req.hostname === 'metype-ffe25.firebaseapp.com'
-    ) {
-        res.header('Access-Control-Allow-Origin', 'https://metype-ffe25.web.app');
-        res.header('Access-Control-Allow-Methods', '*');
-        res.header('Access-Control-Allow-Headers', '*');
-    }
+    res.vary('Origin');
+
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Authorization, Content-Type');
 
     res.header('Vary', 'Origin');
     
