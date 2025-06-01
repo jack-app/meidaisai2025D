@@ -49,7 +49,7 @@ export default class UserDataManager implements IUserDataManager {
         if (!token) throw new Error('認証トークンの取得に失敗しました');
 
         const response = await fetch(
-            `${Host.functions.href}/api/user`, {
+            `${Host.functions.href}api/user`, {
             headers: {
                 'Authorization': `Bearer ${token}`
             }
@@ -157,7 +157,7 @@ export default class UserDataManager implements IUserDataManager {
             if (!token) throw new Error('認証トークンの取得に失敗しました');
 
             const response = await fetch(
-                `${Host.functions.href}/api/user`, {
+                `${Host.functions.href}api/user`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -235,7 +235,7 @@ export default class UserDataManager implements IUserDataManager {
             };
 
             const response = await fetch(
-                `${Host.functions.href}/api/records`, {
+                `${Host.functions.href}api/records`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -270,7 +270,7 @@ export default class UserDataManager implements IUserDataManager {
             if (!token) throw new Error('認証トークンの取得に失敗しました');
 
             const response = await fetch(
-                `${Host.functions.href}/api/records/latest`, {
+                `${Host.functions.href}api/records/latest`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -303,23 +303,3 @@ export default class UserDataManager implements IUserDataManager {
     }
     
 }
-
-
-// namespace Endpoints {
-//     const login = new URL('/api/login', Host.functions);
-//     const signup = new URL('/api/signup', Host.functions);
-//     const getData = new URL('/api/user', Host.functions);
-//     const setData = new URL('/api/user', Host.functions);
-// }
-
-// class Intaractor {
-
-// }
-
-// class AuthModule {
-
-// }
-
-// class Parser {
-
-// }

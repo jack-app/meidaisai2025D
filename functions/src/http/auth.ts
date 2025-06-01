@@ -29,9 +29,18 @@ export async function authMiddleware(req: Request, res: Response, next: Function
 export async function allowCors(req: Request, res: Response, next: Function) {
     // ローカルホストの場合全てのポートを許可
     console.log('allowing cors access');
-    res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:5000');
-    res.header('Access-Control-Allow-Methods', '*');
-    res.header('Access-Control-Allow-Headers', '*');
+    if (
+        req.hostname.includes('localhost') 
+        || req.hostname.includes('127.0.0.1')
+        || req.hostname.includes('metype-ffe25.web.app')
+        || req.hostname.includes('metype-ffe25.firebaseapp.com')
+    ) {
+        res.header('Access-Control-Allow-Origin', req.hostname);
+        res.header('Access-Control-Allow-Methods', '*');
+        res.header('Access-Control-Allow-Headers', '*');
+    }
+
+    res.header('Vary', 'Origin');
     
     return next();
 }
