@@ -205,8 +205,6 @@ export default class GameScene extends SceneBase {
     this.textContainer.removeChildren();
     this.backgroundContainer.removeChildren();
     
-    console.log(this.problemData)
-    
     let currentX = this.firstLetterPosX;
     let currentY = this.firstLinePosY;
 
