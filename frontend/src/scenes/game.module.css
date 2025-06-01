@@ -16,13 +16,15 @@ html {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 20px;
-    background: #2a2a2a;
+    background: #333;
     /* border-radius: 8px; */
-    margin:0px 20px 20px 20px;
+    margin:0px 20px 0px 20px;
+    padding-right: 5px;
+    height: 10vh;
 }
 .title {
-    margin:  0;
-    color: #007ACC;
+    margin: 0;
+    color: #005CAF;
 }
 .situation {
     display: flex;
@@ -33,7 +35,7 @@ html {
 }
 .situationExplainTag {
     font-size: 12px;
-    color: #888;
+    color: #999;
 }
 .start{
     position: fixed;
@@ -54,6 +56,7 @@ html {
     font-size: 2vw;
     font-weight: bold;
     color: #9d9fcc;
+    height: auto;
 }
 .end {
     position: fixed;
@@ -68,12 +71,12 @@ html {
     flex-direction: column;
     justify-content: center;
     align-content: flex-start;
-    padding-left: 50px;
+    /* padding-left: 50px; */
     background-color: #333;
 }
 
 .containerStyle {
-  padding-left: 50px;
+  padding-left: 10vw;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -83,15 +86,15 @@ html {
 
 }
 .resultStyle {
-  font-size: clamp(16px, 4vw, 48px);
+  font-size: clamp(16px, 5vw, 52px);
   font-weight: bold;
   color: #eee;
 }
 .textStyle {
-  font-size: clamp(16px, 4vw, 48px);
+  font-size: clamp(16px, 4.5vw, 52px);
   font-weight: bold;
   color: #eee;
-  padding-left: 25px;
+  padding-left: 5vw;
 }
 .outerButton {
   display: flex;
@@ -121,14 +124,98 @@ html {
 }
 
 .homeButton span {
-  color: #FF00FF;
+  color: #f17ef1;
 }
-.key{
+.smallkey{
   text-align: center;
-  color: #9d9fcc;
-  padding: 5px;
+  color: #eee;
+  padding: 6px 9px 6px 9px;
+  margin-right: 2px;
   border: 1px solid #333;
   border-radius: 10px;
-  box-shadow: 4px 4px 8px #1d1d1d, -4px -4px 8px #555;
+  box-shadow: 4px 4px 8px #111, -4px -4px 8px #555;
   background-color: #333;
+}
+
+.bigkey{
+  text-align: center;
+  color: #9d9fcc;
+  padding: 9px;
+  margin-right: 2px;
+  border: 1px solid #333;
+  border-radius: 10px;
+  box-shadow: 5px 5px 10px #111, -5px -5px 10px #555;
+  background-color: #333;
+}
+.canvas{
+  background: #0f0f0f;
+  border-radius: 8px;
+  /* padding: 20px; */
+  border: 20px solid #333;
+  border-color: #333;
+  min-height: 400px;
+  position: relative;
+}
+.correct{
+  color: #FCBAD3;
+  position: relative;
+  cursor: pointer;
+  padding: 0 5px;
+}
+.miss{
+  color: #ffffd2;
+  position: relative;
+  cursor: pointer;
+  padding: 0 5px;
+}
+.correctRate{
+  color: #A8D8EA;
+  position: relative;
+  cursor: pointer;
+  padding: 0 5px;
+}
+.wpm{
+  color: #AA96DA;
+  position: relative;
+  cursor: pointer;
+  padding: 0 5px;
+}
+.Hover{
+  width: max-content; /* 横幅 */
+  position: absolute;
+  left: 50%;
+  bottom: 80%; /* Y軸の位置 */
+  transform: translateX(-50%);
+  margin-bottom: 8px; /* テキストとの距離 */
+  padding: 5px;
+  border-radius: 3px; /* 角の丸み */
+  background-color: #666;
+  font-size: 0.4em;
+  color: #fff;
+  text-align: center;
+  visibility: hidden; /* ツールチップを非表示に */
+  opacity: 0; /* 不透明度を0％に */
+  z-index: 1;
+  transition: 0.5s all; /* マウスオーバー時のアニメーション速度 */
+  font-weight: 300;
+}
+.correct:hover .Hover { /* マウスオーバー時のスタイル */
+  bottom: 100%; /* Y軸の位置 */
+  visibility: visible; /* ツールチップを表示 */
+  opacity: 1; /* 不透明度を100％に */
+}
+.miss:hover .Hover { /* マウスオーバー時のスタイル */
+  bottom: 100%; /* Y軸の位置 */
+  visibility: visible; /* ツールチップを表示 */
+  opacity: 1; /* 不透明度を100％に */
+}
+.correctRate:hover .Hover { /* マウスオーバー時のスタイル */
+  bottom: 100%; /* Y軸の位置 */
+  visibility: visible; /* ツールチップを表示 */
+  opacity: 1; /* 不透明度を100％に */
+}
+.wpm:hover .Hover { /* マウスオーバー時のスタイル */
+  bottom: 100%; /* Y軸の位置 */
+  visibility: visible; /* ツールチップを表示 */
+  opacity: 1; /* 不透明度を100％に */
 }
