@@ -166,11 +166,11 @@ export default class GameScene extends SceneBase {
   private readonly charWidth = 12;
 
   // 文字の表示処理
-  private putCharAt(x: number, y: number, char: string, backgroundColor: number, textColor: number): void {
+  private putCharAt(x: number, y: number, char: string, charWidth: number, backgroundColor: number, textColor: number): void {
     // 背景矩形
     if (backgroundColor !== 0x000000) {
       const bg = new Graphics();
-      bg.rect(x - 2, y - 2, this.charWidth, this.lineHeight);
+      bg.rect(x - 2, y - 2, charWidth, this.lineHeight);
       bg.fill(backgroundColor);
       this.backgroundContainer.addChild(bg);
     }
@@ -218,8 +218,10 @@ export default class GameScene extends SceneBase {
         // 文字の背景色を決定
         const backgroundColor = 0x22C55E; // 緑
         const textColor = 0x000000; // 黒
-        this.putCharAt(currentX, currentY, char, backgroundColor, textColor);
-        currentX += this.charWidth;
+        // マルチバイト文字の場合は幅を2倍にする
+        const width = this.charWidth * (this.isJapanese(char) ? 2 : 1);
+        this.putCharAt(currentX, currentY, char, width, backgroundColor, textColor);
+        currentX += width;
       }
     }
 
@@ -231,8 +233,10 @@ export default class GameScene extends SceneBase {
       const backgroundColor = 0xEAB308; // 黄色
       const textColor = 0xeeeeee; // 灰色
       const currentChar = this.problemData.charAtCursor();
-      this.putCharAt(currentX, currentY, currentChar, backgroundColor, textColor);
-      currentX += this.charWidth;
+      // マルチバイト文字の場合は幅を2倍にする
+      const width = this.charWidth * (this.isJapanese(currentChar) ? 2 : 1);
+      this.putCharAt(currentX, currentY, currentChar, width, backgroundColor, textColor);
+      currentX += width;
     }
 
     for (const token of this.problemData.tokensAfterCursor()) {
@@ -245,8 +249,10 @@ export default class GameScene extends SceneBase {
         }
         const backgroundColor = 0x000000; // 透明
         const textColor = 0xFFFFFF; // 白
-        this.putCharAt(currentX, currentY, char, backgroundColor, textColor);
-        currentX += this.charWidth;
+      // マルチバイト文字の場合は幅を2倍にする
+        const width = this.charWidth * (this.isJapanese(char) ? 2 : 1);
+        this.putCharAt(currentX, currentY, char, width, backgroundColor, textColor);
+        currentX += width;
       }
     }
 
@@ -262,6 +268,12 @@ export default class GameScene extends SceneBase {
     this.textContainer.x = -scrollOffsetX + 20;
     this.backgroundContainer.x = -scrollOffsetX + 20;
 
+  }
+
+  // https://stackoverflow.com/questions/4877326/how-can-i-tell-if-a-string-contains-multibyte-characters-in-javascript
+  private isJapanese(testee: string): boolean {
+    return /[\u3041-\u3096\u30A1-\u30FA]|[ー々〇〻\u3400-\u9FFF\uF900-\uFAFF]|[\uD840-\uD87F][\uDC00-\uDFFF]/
+      .test(testee);
   }
 
 MiddleCanvas(): JSXElement {

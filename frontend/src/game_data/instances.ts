@@ -3,16 +3,7 @@ import { SourceCode } from "./problems";
 const SourceCodeInstances: SourceCode[] = [
   new SourceCode(
     "sample1",
-`import { createSignal, Show } from 'solid-js'
-import FixedAspectRatio from './components/fixedAspectRatio'
-
-import type SceneBase from './scenes/fundation/sceneBase'
-
-import LoadingScene from './scenes/loading'
-import instanciateAllScenes from './scenes/fundation/instanciate'
-import SceneSig from './scenes/fundation/signatures'
-// 全シーンで共通のSceneManagerを使用する．
-import { sceneManager } from './const'
+`// 全シーンで共通のSceneManagerを使用する．
 
 function ViewRoot() {
 
