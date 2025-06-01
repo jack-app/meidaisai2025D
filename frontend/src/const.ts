@@ -56,12 +56,12 @@ export const Firebase = {
 // 定数
 export const Host = {
      functions : isDev 
-        ? new URL('http://127.0.0.1:5001/metype-ffe25/asia-northeast1/appFunction')
-        : new URL('https://metype-ffe25.firebaseapp.com'),
+        ? 'http://127.0.0.1:5001/metype-ffe25/asia-northeast1/appFunction'
+        : 'https://metype-ffe25.firebaseapp.com',
 
      hosting : isDev
-        ? new URL('http://127.0.0.1:5000')
-        : new URL('https://metype-ffe25.web.app')
+        ? 'http://127.0.0.1:5000'
+        : 'https://metype-ffe25.web.app'
 }
 
 // Singleton - 実装版のUserDataManagerを使用
