@@ -1,4 +1,4 @@
-import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, type User, signOut } from 'firebase/auth';
+import { onAuthStateChanged, signInWithPopup, GoogleAuthProvider, type User, signOut, browserPopupRedirectResolver } from 'firebase/auth';
 import { Host, Firebase } from '../../const';
 import type IUserDataManager from './interface';
 import { type GameStats, UserId, UserName, type RecordSummary, type UserSetting, type UserState } from './types';
@@ -85,7 +85,7 @@ export default class UserDataManager implements IUserDataManager {
     async signInWithGoogle(): Promise<boolean> {
         try {
             const provider = new GoogleAuthProvider();
-            await signInWithPopup(Firebase.auth, provider);
+            await signInWithPopup(Firebase.auth, provider, browserPopupRedirectResolver);
             return true;
         } catch (error) {
             console.error('Googleサインインエラー:', error);
