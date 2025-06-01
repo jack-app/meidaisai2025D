@@ -96,7 +96,7 @@ export default class GameScene extends SceneBase {
         this.gameSetting?.timeLimitPresentation
         && currentStats.timeRemaining <= 0
       ) {
-        this.endGame(this.stats());
+        this.endGame();
         return;
       }
       
@@ -112,12 +112,12 @@ export default class GameScene extends SceneBase {
   }
 
   // ゲーム終了
-  private endGame(Stats: GameStats): void {
+  private endGame(): void {
     this.setGameEnded(true);
     if (this.gameTimer) {
       clearInterval(this.gameTimer);
     }
-    userDataManager.putRecord(Stats)
+    userDataManager.putRecord(this.stats())
   }
 
   // キー入力処理
@@ -146,17 +146,16 @@ export default class GameScene extends SceneBase {
         ...prev,
         correctTypes: prev.correctTypes + 1
       }));
-      
-      // 問題完了チェック
-      if (this.problemData.completed) {
-        this.endGame(this.stats());
-      }
     } else {
       // ミス
       this.setStats(prev => ({
         ...prev,
         mistypes: prev.mistypes + 1
       }));
+    }
+    // 問題完了チェック
+    if (this.problemData.completed) {
+      this.endGame();
     }
     this.setStats(prev => ({
         ...prev,
