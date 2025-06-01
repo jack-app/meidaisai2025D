@@ -147,9 +147,10 @@ export class Problem {
   }
 
   private get currentCharShouldBeSkipped() {
-    return [
-      " ", "\t", "\n", undefined // undefinedは空のトークンに入ったときに対応
-    ].includes(this.currentChar)
+    return (
+      this.currentChar === undefined // undefinedは長さ0のtokenに対応
+      || !/[\u0021-\u007F]/.test(this.currentChar) // 通常の英数記号以外はスキップ
+    );
   }
   private get currentTokenShouldBeSkipped() {
     return [Scope.comment].includes(this.currentToken.scope);
