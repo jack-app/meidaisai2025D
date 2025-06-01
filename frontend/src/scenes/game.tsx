@@ -7,6 +7,7 @@ import styles from "./game.module.css";
 import { type GameStats, type UserSetting } from "../data_interface/user_data/types";
 import { userDataManager, Host } from "../const.ts";
 import metype from "/images/METYPE.png";
+import { render } from "solid-js/web";
 
 import { Problem } from "../game_data/problems.ts";
 import SourceCodeInstances from "../game_data/instances.ts";
@@ -228,7 +229,7 @@ export default class GameScene extends SceneBase {
     }
 
     // 現在入力位置を記録
-    const curosrPositionX = currentX;
+    const cursorPositionX = currentX;
     const cursorPositionY = currentY;
     // 現在の文字を取得 改行は取得され得ないので，改行処理は入れない．
     {
@@ -261,11 +262,11 @@ export default class GameScene extends SceneBase {
     const viewportHeight = this.pixiApp.renderer.height;
     const scrollOffsetY = Math.max(0, cursorPositionY - viewportHeight / 2);
 
-    this.textContainer.y = -scrollOffsetY + 40;
-    this.backgroundContainer.y = -scrollOffsetY + 40;
+    this.textContainer.y = -scrollOffsetY + 20;
+    this.backgroundContainer.y = -scrollOffsetY + 20;
 
     const viewportWidth = this.pixiApp.renderer.width;
-    const scrollOffsetX = Math.max(0, curosrPositionX - viewportWidth / 2);
+    const scrollOffsetX = Math.max(0, cursorPositionX - viewportWidth / 1.6);
 
     this.textContainer.x = -scrollOffsetX + 20;
     this.backgroundContainer.x = -scrollOffsetX + 20;
@@ -349,38 +350,45 @@ export default class GameScene extends SceneBase {
 
   // コンポーネントを作成する
   makeComponent(): JSXElement {
+    const [num1, setNum1] = createSignal(0);
+    const [num2, setNum2] = createSignal(0);
+    setInterval(() => setNum1((num1() + 10) % 255), 1000)
+    setInterval(() => setNum2((num2() + 5) % 255), 1000)
     return <>
       <div class={styles.whole}>
         <div class={styles.whole2}>
-          <img src={metype} style={{"height": "12vh", "border-radius": "8px"}}/>
+          {/* <img src={metype} style={{"height": "12vh", "border-radius": "8px"}}/> */}
+          <div style={{"color": `rgb(${num1()}, 180, ${num2()})`}}>
+            <h1>METYPE</h1>
+          </div>
           <div class={styles.situation}>
             <div class={styles.situationExplain}>
               <div class={styles.situationExplainTag}>正解</div>
-              <div style={{"font-size": "24px", "color": "#22C55E", "font-weight": "bold"}}>
+              <div style={{"font-size": "24px", "color": "#FCBAD3", "font-weight": "bold"}}>
                 {this.stats().correctTypes}
               </div>
             </div>
             <div class={styles.situationExplain}>
               <div class={styles.situationExplainTag}>ミス</div>
-              <div style={{"font-size": "24px", "color": "#EF4444", "font-weight": "bold"}}>
+              <div style={{"font-size": "24px", "color": "#FFFFD2", "font-weight": "bold"}}>
                 {this.stats().mistypes}
               </div>
             </div>
             <div class={styles.situationExplain}>
               <div class={styles.situationExplainTag}>正解率</div>
-              <div style={{"font-size": "24px", "color": "#hd2948", "font-weight": "bold"}}>
+              <div style={{"font-size": "24px", "color": "#A8D8EA", "font-weight": "bold"}}>
                 {this.stats().correctRate}%
               </div>
             </div>
             <div class={styles.situationExplain}>
               <div class={styles.situationExplainTag}>WPM</div>
-              <div style={{"font-size": "24px", "color": "#75f483", "font-weight": "bold"}}>
+              <div style={{"font-size": "24px", "color": "#AA96DA", "font-weight": "bold"}}>
                 {this.stats().wpm}
               </div>
             </div>
             <div class={styles.situationExplain}>
               <div class={styles.situationExplainTag}>残り時間</div>
-              <div style={{"font-size": "24px", "color": "#EAB308", "font-weight": "bold"}}>
+              <div style={{"font-size": "24px", "color": "#81f1ad", "font-weight": "bold"}}>
                 {this.stats().timeRemaining}s
               </div>
             </div>
@@ -390,13 +398,13 @@ export default class GameScene extends SceneBase {
         {!this.gameStarted() && !this.gameEnded() && (
           <div class={styles.start}>
               <div class={styles.startText}>
-                <h3>Enterを押してゲームを開始して下さい</h3>
+                <p><span class={styles.bigkey}>Enter</span>キーを押してゲームを開始して下さい</p>
               </div>
               <div class={styles.startText}>
-                <h3>制限時間：{this.stats().totalTime}秒</h3>
+                <p>制限時間：{this.stats().totalTime}秒</p>
               </div>
-              <div class={styles.startText}>
-                <p>ゲーム中、<span class={styles.key}>Space</span>・<span class={styles.key}>Enter</span>キーを押す必要はありません</p>
+              <div style={{"font-weight": "bold", "color": "#eee", "margin-top": "20px", "font-size": "1.5vw"}}>
+                <p>ゲーム中、<span class={styles.smallkey}>Space</span>・<span class={styles.smallkey}>Enter</span>キーを押す必要はありません</p>
               </div>
           </div>
         )}
@@ -407,16 +415,16 @@ export default class GameScene extends SceneBase {
             <div class={styles.containerStyle}>
                 <div class={styles.resultStyle}> &lt;Result&gt; </div>
                 <div>
-                    <div class={styles.textStyle}> correct = <span style={{"color": "#22C55E"}}>{this.stats().correctTypes} </span>byte</div>
+                    <div class={styles.textStyle}> correct = <span class={styles.correct}>{this.stats().correctTypes}<span class={styles.Hover}>(property) correct: number</span> </span>byte;</div>
                 </div>
                 <div>
-                    <div class={styles.textStyle}> miss = <span style={{"color": "#22C55E"}}>{this.stats().mistypes} </span>byte</div>
+                    <div class={styles.textStyle}> miss = <span class={styles.miss}>{this.stats().mistypes}<span class={styles.Hover}>(property) miss: number</span> </span>byte;</div>
                 </div>
                 <div>
-                    <div class={styles.textStyle}> correctRate = <span style={{"color": "#22C55E"}}>{this.stats().correctRate} </span>%</div>
+                    <div class={styles.textStyle}> correctRate = <span class={styles.correctRate}>{this.stats().correctRate}<span class={styles.Hover}>(property) correctRate: number</span> </span>%;</div>
                 </div>
                 <div>
-                    <div class={styles.textStyle}> WPM = <span style={{"color": "#22C55E"}}>{this.stats().wpm}</span></div>
+                    <div class={styles.textStyle}> WPM = <span class={styles.wpm}>{this.stats().wpm}<span class={styles.Hover}>(property) WPM: number</span></span>;</div>
                 </div>
                 <div class={styles.resultStyle}> &lt;/Result&gt; </div>
             </div>
@@ -428,15 +436,7 @@ export default class GameScene extends SceneBase {
           </div>
         )}
 
-        <div style={{
-          "background": "#0f0f0f",
-          "border-radius": "8px",
-          // "padding": "20px",
-          "border": "20px solid #333",
-          "border-color": "#333",
-          "min-height": "400px",
-          "position": "relative"
-        }}>
+        <div class={styles.canvas}>
           {this.MiddleCanvas()}
         </div>
       </div>
