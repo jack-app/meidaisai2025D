@@ -31,7 +31,7 @@ const firebaseApp = initializeApp(
     : {
         projectId: "metype-ffe25",
         apiKey: "AIzaSyA8p4gso3Jo2N00ABARjlBICy471S58PpU",
-        authDomain: "metype-ffe25.firebaseapp.com"
+        authDomain: "metype-ffe25.web.app"
     }
 );
 
@@ -57,7 +57,7 @@ export const Firebase = {
 export const Host = {
      functions : isDev 
         ? new URL('http://127.0.0.1:5001/metype-ffe25/asia-northeast1/appFunction')
-        : new URL('https://metype-ffe25.web.app'),
+        : new URL('https://metype-ffe25.firebaseapp.com'),
 
      hosting : isDev
         ? new URL('http://127.0.0.1:5000')
