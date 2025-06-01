@@ -1,4 +1,4 @@
-import { onMount, createSignal, type JSXElement, type Accessor } from "solid-js";
+import { onMount, createSignal, type JSXElement, type Accessor, type Signal } from "solid-js";
 import SceneBase from "./fundation/sceneBase";
 import type SceneManager from "./fundation/sceneManager";
 import { Container, Application as PixiApp, Text, TextStyle, Graphics } from 'pixi.js'
@@ -39,14 +39,7 @@ export default class GameScene extends SceneBase {
   private backgroundContainer!: Container;
   
   // Solid.jsシグナルでリアクティブな状態管理
-  public statsSignal = createSignal<GameStats>({
-    correctTypes: 0,
-    mistypes: 0,
-    timeRemaining: 60,
-    correctRate: 0,
-    wpm: 0,
-    totalTime: 60
-  });
+  public statsSignal!: Signal<GameStats>;
   public get stats() { return this.statsSignal[0]; }
   public get setStats() { return this.statsSignal[1]; }
   
@@ -72,8 +65,19 @@ export default class GameScene extends SceneBase {
   async load(): Promise<void> {
     this.problemData = GameDataProvider.getProblem();
     this.gameSetting = await userDataManager.getUserSetting();
-    console.log(this.gameSetting);
+    this.statsSignal = createSignal<GameStats>({
+      correctTypes: 0,
+      mistypes: 0,
+      timeRemaining: 60,
+      correctRate: 0,
+      wpm: 0,
+      totalTime: 60
+    });
+    this.setGameEnded(false);
+    this.setGameStarted(false);
+    this.pixiApp.stage.removeChildren();
   }
+
 
   // ゲーム開始
   private startGame(): void {
@@ -90,7 +94,7 @@ export default class GameScene extends SceneBase {
         this.gameSetting?.timeLimitPresentation
         && currentStats.timeRemaining <= 0
       ) {
-        this.endGame(this.statsSignal[0]());
+        this.endGame(this.stats());
         return;
       }
       
@@ -143,7 +147,7 @@ export default class GameScene extends SceneBase {
       
       // 問題完了チェック
       if (this.problemData.completed) {
-        this.endGame(this.statsSignal[0]());
+        this.endGame(this.stats());
       }
     } else {
       // ミス
