@@ -33,24 +33,8 @@ export default ViewRoot`,
 "typescript",
 ),
 new SourceCode(
-"view_import",
-`// ViewRootを作るために必要なモジュールをインポート
-import { createSignal, Show } from 'solid-js'
-import FixedAspectRatio from './components/fixedAspectRatio'
-
-import type SceneBase from './scenes/fundation/sceneBase'
-
-import LoadingScene from './scenes/loading'
-import instanciateAllScenes from './scenes/fundation/instanciate'
-import SceneSig from './scenes/fundation/signatures'
-// 全シーンで共通のSceneManagerを使用する．
-import { sceneManager } from './const'`,
-"typescript"
-),
-new SourceCode(
-"index",
-`// htmlから呼びだされるスクリプトのエントリーポイント
-/* @refresh reload */
+"frontend_index",
+`/* @refresh reload */
 import './index.css'
 
 // solid bootstrap
@@ -63,12 +47,11 @@ render(
     </>, 
     root!
 )`,
-"typescript"
+"typescript",
 ),
 new SourceCode(
-"index",
-`// 全プログラムを通して使用される共通の値やインスタンス
-import SceneManager from './scenes/fundation/sceneManager';
+"const_ts",
+`import SceneManager from './scenes/fundation/sceneManager';
 import type IUserDataManager from './data_interface/user_data/interface';
 import UserDataManager from './data_interface/user_data/userData'; // 実装版を使用
 
@@ -79,153 +62,93 @@ const isDev =
     || host.startsWith('127.0.0.1') 
     || host.startsWith('::1')
 
+if (isDev) {
+    console.log('開発環境で実行しています．');
+}
+
 // Singleton - 実装版のUserDataManagerを使用
 export const userDataManager: IUserDataManager = new UserDataManager()
-export const sceneManager = new SceneManager()
-`,
+export const sceneManager = new SceneManager()`,
 "typescript"
 ),
 new SourceCode(
-"explanation",
-`// 説明画面
-makeComponent(): JSXElement {
-  return <div style={
-      {
-          position: 'relative',
-          width: '100%',
-          height: '100%',
-      }
-  }>
-  <div style={{
-      "width": '100%',
-      "height": '100%',
-      "background-image": 'url("/background.png")',
-      "background-size": 'cover',
-      "background-position": 'center',
-      "background-repeat": 'no-repeat',
-      "position": 'absolute',
-      "top": '0px',
-      "left": '0px',
-      "z-index": '-1',
-  }}>
+"title_scene",
+`import { onMount, type JSXElement, createEffect } from "solid-js";
+import SceneBase from "./fundation/sceneBase";
+import type SceneManager from "./fundation/sceneManager";
+import { Container, Application as PixiApp } from "pixi.js";
+import SceneSig from "./fundation/signatures";
+import { userDataManager } from "../const"; // const.tsからインポートに変更
+import type { CredentialResponse } from "google-one-tap";
 
-  </div>
-  <div style={{
-      "width": '70%',
-      "height":'18%',
-      "background-color":'#ECEBEE',
-      "position":'absolute',
-      "top":'19%',
-      "left":'20%',
-      "font-size": '5vh',
-      "font-weight": 'bold',
-      "display": 'flex',
-      "align-items": 'center',
-      "padding-left":'3%',
-      "color":'black'
-      }}>
-      
-  </div>
-  </div>
-}`,
-"typescript"
-),
-new SourceCode(
-"selection",
-`makeComponent(): JSXElement {
-  return (
-    <div style={{
-        width: '100%',
-        height: '100%',
-        "background-image": 'url(/images/background.png)',
-        "background-size": 'cover',
-        display: 'flex',
-        "flex-direction": 'column',
-        "justify-content": 'center',
-        "align-items": 'center',
-        gap: '20px'
-    }}>
-        {[
-          {label: "setting", sig: SceneSig.setting}, 
-          {label:"explanation", sig:SceneSig.explanation}, 
-          {label: "start game", sig: SceneSig.game}, 
-          {label: "record", sig: SceneSig.record}
-        ].map(({label, sig}) => (
-            <button style={{
-                width: '400px',
-                padding: '20px',
-                "font-size": '20px',
-                "background-color": '#E3DEF1',
-                color: 'black',
-                border: 'none',
-                "border-radius": '8px'
-            }}
-            onClick={() => {
-                this.manager.changeSceneTo(sig);
-            }}
-            >
-                {label}
-            </button>
-        ))}
-    </div>
-  );
-}`,
-"typescript"
-),
-new SourceCode(
-"setting",
-`// 設定画面
-export default class SettingScene extends SceneBase {  
-  
-  // ...
-
-  makeComponent(): JSXElement {
-      return <Background>
-          <Header onClose={() => this.manager.changeSceneTo(SceneSig.selection)} />
-          <Body 
-              eventListeners={{
-                  timelimit: (checked) => {
-                      this.setting.timeLimitPresentation = checked;
-                      userDataManager.setUserSetting(this.setting);
-                  }
-              }}
-              initialSetting={this.setting}
-          />
-      </Background>
+declare global {
+  interface Window {
+    google: any;
   }
 }
 
-function Background(props: {children: JSXElement}) {
-    return (
-        <div style={{
-            width: '100%',
-            height: '100%',
-            "background-image": 'url(/images/background.png)',
-            "background-size": 'cover',
-            display: 'flex',
-            "flex-direction": 'column',
-            "justify-content": 'center',
-            "align-items": 'center',
-            gap: '20px'
-        }}>
-            {props.children}
-        </div>
+export default class TitleScene extends SceneBase {
+  constructor(manager: SceneManager) {
+    super(manager, SceneSig.title, { initialScene: true });
+  }
+
+  private pixiApp!: PixiApp;
+
+  async preload(): Promise<void> {
+    console.log(\`Preloading \${this.sceneSignature}...\`);
+
+    const pixiApp = new PixiApp();
+    await pixiApp.init({
+      backgroundAlpha: 0,
+    });
+
+    this.pixiApp = pixiApp;
+    this.manager.changeSceneTo(SceneSig.title);
+  }
+
+  MiddleCanvas(): JSXElement {
+    this.makePixiAppContent();
+
+    const canvasHolder = (
+      <div style={{ height: "100%", width: "100%" }}>{this.pixiApp.canvas}</div>
+    ) as HTMLElement;
+
+    onMount(() => {
+      console.log("MiddleCanvas onMount");
+      this.arrangeContent(canvasHolder);
+      window.addEventListener("resize", () => {
+        this.arrangeContent(canvasHolder);
+      });
+    });
+
+    return canvasHolder;
+  }
+
+  makePixiAppContent() {
+    const container = new Container();
+    this.pixiApp.stage.addChild(container);
+    return container;
+  }
+
+  arrangeContent(canvasHolder: HTMLElement) {
+    this.pixiApp.renderer.resize(
+      canvasHolder.clientWidth,
+      canvasHolder.clientHeight
     );
-}
-`,
-"typescript"
-),
-new SourceCode(
-"title",
-`export default class TitleScene extends SceneBase {
-  // ...
+  }
 
   // Googleログインボタンのクリックハンドラー
   private async handleGoogleLogin() {
     try {
       const success = await userDataManager.signInWithGoogle();
+      if (success) {
+        console.log("Googleログイン成功");
+        // ログイン成功は createEffect で自動的に処理される
+      } else {
+        console.error("Googleログインに失敗しました");
+      }
     } catch (error) {
-      console.error(error);
+      console.error("ログインエラー:", error);
     }
   }
 
@@ -237,6 +160,7 @@ new SourceCode(
     // ログイン状態が変わったら自動的に遷移
     createEffect(() => {
       if (userState.isLoggedIn) {
+        console.log("ログイン状態を検知、セレクト画面へ遷移");
         this.manager.changeSceneTo(SceneSig.selection);
       }
     });
@@ -273,7 +197,42 @@ new SourceCode(
             gap: "1rem",
           }}
         >
-          
+          {/* Firebaseログインボタン */}
+          <button
+            style={{
+              color: "white",
+              "font-size": "16px",
+              "background-color": "#4285f4",
+              padding: "12px 24px",
+              border: "none",
+              "border-radius": "4px",
+              cursor: "pointer",
+              "min-width": "200px",
+            }}
+            onClick={() => this.handleGoogleLogin()}
+          >
+            Googleでログイン
+          </button>
+
+          {/* ゲストログインボタン */}
+          <button
+            style={{
+              color: "white",
+              "font-size": "16px",
+              "background-color": "#007bff",
+              padding: "8px 16px",
+              border: "none",
+              "border-radius": "4px",
+              cursor: "pointer",
+              "min-width": "200px",
+            }}
+            onClick={() => {
+              console.log("ゲストモードでログインしました");
+              this.manager.changeSceneTo(SceneSig.selection);
+            }}
+          >
+            ゲストで続行
+          </button>
         </div>
       </div>
     );
@@ -282,973 +241,458 @@ new SourceCode(
 "typescript",
 ),
 new SourceCode(
-"instanciate_scenes",
-`import type SceneManager from "./sceneManager";
-import ExampleScene from "../example";
-import ExplanationScene from "../explanation";
-import GameScene from "../game";
-import RecordScene from "../record";
-import SelectionScene from "../selection";
-import SettingScene from "../setting";
-import TitleScene from "../title";
+"game_scene",
+`import { onMount, createSignal, type JSXElement, type Accessor, type Signal } from "solid-js";
+import SceneBase from "./fundation/sceneBase";
+import type SceneManager from "./fundation/sceneManager";
+import { Container, Application as PixiApp, Text, TextStyle, Graphics } from 'pixi.js'
+import SceneSig from "./fundation/signatures";
+import styles from "./game.module.css";
+import { type GameStats, type UserSetting } from "../data_interface/user_data/types";
+import { userDataManager, Host } from "../const.ts";
+import metype from "/images/METYPE.png";
+import { render } from "solid-js/web";
 
-export default function instanciateAllScenes(manager: SceneManager) {
-    // ここですべてのシーンをインスタンス化する
-    new ExampleScene(manager);
-    new ExplanationScene(manager);
-    new GameScene(manager);
-    new RecordScene(manager);
-    new SelectionScene(manager);
-    new SettingScene(manager);
-    new TitleScene(manager);
-}`,
-"typescript"
-),
-new SourceCode(
-"scene_manager",
-`import type SceneBase from "./sceneBase";
-import SceneSig from "./signatures";
+import { Problem } from "../game_data/problems.ts";
+import SourceCodeInstances from "../game_data/instances.ts";
 
-export default class SceneManager {
-    // シーンの一覧を保管する．
-    private readonly scenes: Map<SceneSig, SceneBase> = new Map();
-
-    // シーンの変更を監視するためのコールバック関数を設定する．
-    private sceneChangeCallback: ((scene: SceneBase) => void)|null = null;
-    bindSceneChangeCallback(callback: (scene: SceneBase) => void) {
-        this.sceneChangeCallback = callback;
-        if (this.currentScene) {
-            this.sceneChangeCallback(this.currentScene);
-        }
-    }
-    // 現在のシーンを保管/更新する
-    private currentScene: SceneBase | null = null;
-    private async updateCurrentScene(scene: SceneBase) {
-        const previousScene = this.currentScene;
-        await scene.load();
-        this.currentScene = scene;
-        if (this.sceneChangeCallback) {
-            this.sceneChangeCallback(scene);
-        }
-        this.currentScene.activate();
-        previousScene?.deactivate();
-    }
-
-    /// シーンを追加する．SceneBaseから呼ばれる．
-    addScene(scene: SceneBase) {
-        if (this.scenes.has(scene.sceneSignature)) {
-            throw new Error();
-        }
-        if (scene.options.initialScene) {
-            if (this.currentScene) {
-                throw new Error();
-            }
-            this.updateCurrentScene(scene);
-        }
-        this.scenes.set(scene.sceneSignature, scene);
-    }
-
-    /// 現在のシーンをシーンシグネチャで更新する．
-    changeSceneTo(sceneSignature: SceneSig) {
-        if (!this.scenes.has(sceneSignature)) {
-            throw new Error();
-        }
-        this.updateCurrentScene(this.scenes.get(sceneSignature)!);
-    }
-}`,
-"typescript"
-),
-new SourceCode(
-"scene_base",
-`import type SceneManager from "./sceneManager";
-import type { JSXElement } from "solid-js";
-import SceneSig from "./signatures";
-
-export default abstract class SceneBase {
-    constructor(
-        public readonly manager: SceneManager,
-        public readonly sceneSignature: SceneSig, 
-        public readonly options: {
-            initialScene?: boolean, 
-            needsToBeInitialized?: boolean
-        } = {}) 
-    {
-        const defaultOptions = {
-            initialScene: false, 
-            needsToBeInitialized: false
-        }
-        this.options = {...defaultOptions, ...options};
-        
-        this.manager.addScene(this);
-        this.preload();
-    }
-
-    get isInitialized() {
-        return !this.options.needsToBeInitialized;
-    }
-    set isInitialized(value: boolean) {
-        this.options.needsToBeInitialized = !value;
-    }
-
-    /**
-     * シーンが表示される前に必要なリソースの事前ロード処理を行います．
-     * この処理はシーンのインスタンス化と同時に呼び出されます．シーンの表示直前に呼び出したい処理はmakeComponentで実装してください．
-     * 
-     * 必要に応じてサブクラスでオーバーライドしてください．
-     */
-    async preload(): Promise<void> {}
-
-    /**
-     * シーンが表示される前に呼び出されます．
-     * このメソッドの処理が終わるまで，シーンは表示されないので，重い処理をしないように注意してください．
-     * 
-     * また，このメソッドの実行時点ではコンポーネントは作成されていません．
-     * 
-     * 非同期が必要でなければ，makeComponentに実装しても良いでしょう．
-     * 
-     * 必要に応じてサブクラスでオーバーライドしてください．
-     */
-    async load(): Promise<void> {}
-
-    /**
-     * シーンが表示されたときに呼び出されます．
-     * また，このメソッドの実行時点ではコンポーネントは作成されています．
-     * 
-     * このメソッドを使う代わりに，makeComponent内でonMountを使ってもよいでしょう．
-     * 
-     * 必要に応じてサブクラスでオーバーライドしてください．
-     */
-    async activate(): Promise<void> {}
-
-    /**
-     * シーンが非表示になったときに呼び出されます．
-     * また，このメソッドの実行時点でコンポーネントは破棄されています．
-     * 
-     * このメソッドを使う代わりに，makeComponent内でonCleanupを使ってもよいでしょう．
-     * 
-     * 必要に応じてサブクラスでオーバーライドしてください．
-     */
-    async deactivate(): Promise<void> {}
-
-    /**
-     * シーンを表示するときに呼び出されます．
-     * コンポーネントを作成して返却してください．
-     */
-    abstract makeComponent(): JSXElement;
-}`,
-"typescript"
-),
-new SourceCode(
-"fixedAspectRatio",
-`import { createSignal, onMount, type JSX } from 'solid-js';
-import Align from './align';
-
-type FixedAspectRatioProps = {
-    children: JSX.Element,
-    width: number,
-    height: number,
+class GameDataProvider {
+  static getProblem(): Problem {
+    // ProblemInstancesからランダムに問題を取得して返す．
+    return SourceCodeInstances[
+      Math.floor(Math.random() * SourceCodeInstances.length)
+      % SourceCodeInstances.length
+    ].generateProblem();
+  }
 }
 
-/**
- * 固定アスペクト比のコンテナコンポーネントです。
- * 
- * 指定された幅（width）と高さ（height）からアスペクト比を計算し、
- * 親要素のサイズに応じて子要素のサイズを自動的に調整します。
- * ウィンドウサイズの変更にも対応し、常に指定したアスペクト比を維持します。
- * 
- * @param children - 固定アスペクト比内に表示するReactノード
- * @param width - 基準となる幅（ピクセル単位）
- * @param height - 基準となる高さ（ピクセル単位）
- */
-export default function FixedAspectRatio(prop: FixedAspectRatioProps) {
-    const ratio = prop.height / prop.width;
+// ゲーム統計の型
 
-    const [getHeight, setHeight] = createSignal(prop.width);
-    const [getWidth, setWidth] = createSignal(prop.height);
 
-    let holder!: HTMLDivElement;
+export default class GameScene extends SceneBase {
+    
+  constructor(manager: SceneManager) {
+    super(manager, SceneSig.game);
+  }
+  private pixiApp!: PixiApp;
+  private problemData!: Problem;
+  private gameSetting?: UserSetting;
+  /** @deprecated problemDataが現在位置の情報を持つようになったためdeprecated */
+  private currentPosition = 0;
+  private textContainer!: Container;
+  private backgroundContainer!: Container;
+  
+  // Solid.jsシグナルでリアクティブな状態管理
+  public statsSignal!: Signal<GameStats>;
+  public get stats() { return this.statsSignal[0]; }
+  public get setStats() { return this.statsSignal[1]; }
+  
+  private gameStartedSignal = createSignal(false);
+  private get gameStarted() { return this.gameStartedSignal[0]; }
+  private get setGameStarted() { return this.gameStartedSignal[1]; }
+  
+  private gameEndedSignal = createSignal(false);
+  private get gameEnded() { return this.gameEndedSignal[0]; }
+  private get setGameEnded() { return this.gameEndedSignal[1]; }
+  private gameTimer?: number;
 
-    onMount(() => {
-        const {width, height} = calc(holder, ratio)
-        setWidth(width)
-        setHeight(height)
-        window.addEventListener('resize', () => {
-            const {width, height} = calc(holder, ratio)
-            setWidth(width)
-            setHeight(height)
-        })
+  async preload(): Promise<void> {
+    console.log(\`Preloading \${this.sceneSignature}...\`);
+
+    const pixiApp = new PixiApp();
+    await pixiApp.init({ 
+      backgroundAlpha: 0 
     })
+    this.pixiApp = pixiApp;
+  }
 
-    return <div
-        ref={holder}
-        style={{
-            position: 'relative',
-            width: '100%',
-            height: '100%',
-        }}>
-            <Align horizontal="center" vertical="center">
-                <div 
-                    children={prop.children}
-                    style={{
-                        width: \`\${getWidth()}px\`,
-                        height: \`\${getHeight()}px\`,
-                        overflow: 'hidden',
-                    }}
-                />
-            </Align>
-        </div>
-}
+  async load(): Promise<void> {
+    this.problemData = GameDataProvider.getProblem();
+    this.gameSetting = await userDataManager.getUserSetting();
+    this.statsSignal = createSignal<GameStats>({
+      correctTypes: 0,
+      mistypes: 0,
+      timeRemaining: 60,
+      correctRate: 0,
+      wpm: 0,
+      totalTime: 60
+    });
+    this.setGameEnded(false);
+    this.setGameStarted(false);
+    this.pixiApp.stage.removeChildren().forEach(child => {
+      child.destroy();
+    });;
+  }
 
-function calc(holder: HTMLElement, ratio: number) {
-    const maxHeight = holder.clientHeight
-    const maxWidth = holder.clientWidth
 
-    let height = maxWidth * ratio
-    let width = maxWidth
+  // ゲーム開始
+  private startGame(): void {
+    if (this.gameStarted()) return;
+    
+    this.setGameStarted(true);
+    this.setGameEnded(false);
+    
+    // タイマー開始
+    this.gameTimer = window.setInterval(() => {
+      const currentStats = this.stats();
+      if (
+        // timelimitが有効な場合のみタイマーが0以下になったら終了
+        this.gameSetting?.timeLimitPresentation
+        && currentStats.timeRemaining <= 0
+      ) {
+        this.endGame(this.stats());
+        return;
+      }
+      
+      this.setStats(prev => ({
+        ...prev,
+        timeRemaining: prev.timeRemaining - 1
+      }));
+      this.setStats(prev => ({
+        ...prev,
+        wpm: Math.round(60 * prev.correctTypes / (prev.totalTime - prev.timeRemaining))
+      }));
+    }, 1000);
+  }
 
-    if (height > maxHeight) {
-        height = maxHeight
-        width = maxHeight / ratio
+  // ゲーム終了
+  private endGame(Stats: GameStats): void {
+    this.setGameEnded(true);
+    if (this.gameTimer) {
+      clearInterval(this.gameTimer);
+    }
+    userDataManager.putRecord(Stats)
+  }
+
+  // キー入力処理
+  private handleKeyInput(event: KeyboardEvent): void {
+    if (!this.gameStarted() || this.gameEnded()) {
+      if (event.key === 'Enter' && !this.gameStarted()) {
+        this.startGame();
+      }
+      if (event.key === 'Enter' && this.gameEnded()) {
+        this.manager.changeSceneTo(SceneSig.selection);
+      }
+      return;
     }
 
-    return {width, height}
-}`,
-"typescript"
-),
-new SourceCode(
-"userDataManager auth",
-`// ユーザー状態を更新
-private updateUserState(state: UserState) {
-    this.userState = state;
-    this.listeners.forEach((listener) => listener(state));
-}
+    // 特殊キーは無視
+    if (event.key.length > 1 && event.key !== 'Tab' || event.key ===' ') return;
+    
+    event.preventDefault();
+    
+    const targetChar = this.problemData.charAtCursor();
+    
+    if (event.key === targetChar) {
+      // 正解
+      this.problemData.proceed();
+      this.setStats(prev => ({
+        ...prev,
+        correctTypes: prev.correctTypes + 1
+      }));
+      
+      // 問題完了チェック
+      if (this.problemData.completed) {
+        this.endGame(this.stats());
+      }
+    } else {
+      // ミス
+      this.setStats(prev => ({
+        ...prev,
+        mistypes: prev.mistypes + 1
+      }));
+    }
+    this.setStats(prev => ({
+        ...prev,
+        correctRate: Math.round(100 * prev.correctTypes / (prev.correctTypes + prev.mistypes))
+    }));  
+    // 表示更新
+    this.updateDisplay();
+  }
 
-private async fetchDataFromServer() {
-    const token = await this.getAuthToken();
-    if (!token) throw new Error();
 
-    const response = await fetch(
-        \`\${Host.functions.href}/api/user\`, {
-        headers: {
-            'Authorization': \`Bearer \${token}\`
-        }
+  private readonly fontSize = 20;
+  private readonly lineHeight = 24;
+  private readonly charWidth = 12;
+
+  // 文字の表示処理
+  private putCharAt(x: number, y: number, char: string, charWidth: number, backgroundColor: number, textColor: number): void {
+    // 背景矩形
+    if (backgroundColor !== 0x000000) {
+      const bg = new Graphics();
+      bg.rect(x - 2, y - 2, charWidth, this.lineHeight);
+      bg.fill(backgroundColor);
+      this.backgroundContainer.addChild(bg);
+    }
+    
+    // 文字
+
+    const style = new TextStyle({
+      fontFamily: 'Consolas',
+      fontSize: this.fontSize,
+      fill: textColor,
     });
 
-    if (!response.ok) {
-        throw new Error();
-    }
-
-    const data = await response.json();
-    this.userSetting = data.setting ?? {
-        timeLimitPresentation: true,
-        BGM: true,
-        typingSound: true,
-        otherSoundEffect: true
-    };
-    this.recordSummary = data.records ?? {
-        totalTypeByte: 0,
-        bestWPM: 0
-    };
-
-    return {userSetting: this.userSetting!, recordSummary: this.recordSummary!};
-}`,
-"typescript"
-),
-new SourceCode(
-"",
-`// ゲーム記録を保存
-async putRecord(record: GameStats): Promise<void> {
-    // キャッシュを更新
-    this.lastRecord = record;
-
-    // ローカルサマリーを更新
-    if (this.recordSummary) {
-        this.recordSummary.totalTypeByte += record.correctTypes;
-        this.recordSummary.bestWPM = Math.max(
-            this.recordSummary.bestWPM,
-            record.wpm
-        );
-    }
-
-    // ログインしていなければサーバーには保存しない
-    if (!this.userState.isLoggedIn) return;
-
-    try {
-        const token = await this.getAuthToken();
-        if (!token) throw new Error();
-
-        const recordData = {
-            correctTypes: record.correctTypes,
-            mistypes: record.mistypes,
-            correctRate: record.correctRate,
-            timeRemaining: record.timeRemaining,
-            wpm: record.wpm,
-            totalTime: record.totalTime,
-            recordedAt: new Date().toISOString()
-        };
-
-        const response = await fetch(
-            \`\${Host.functions.href}/api/records\`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': \`Bearer \${token}\`
-            },
-            body: JSON.stringify(recordData)
-        });
-
-        if (!response.ok) {
-            throw new Error();
-        }
-    } catch (error) {
-        console.error(error);
-    }
-}`,
-"typescript"
-),
-new SourceCode(
-"getRecordSummary",
-`// 記録サマリーを取得
-async getRecordSummary(): Promise<RecordSummary> {
-    // キャッシュがあれば返す
-    if (this.recordSummary) {
-        return this.recordSummary;
-    }
-
-    // ログインしていない場合は空のサマリーを返す
-    if (!this.userState.isLoggedIn) {
-        return {
-            totalTypeByte: 0,
-            bestWPM: 0
-        };
-    }
-
-    // ログインしていればサーバに問い合わせて返す
-    try {
-        const { recordSummary } = await this.fetchDataFromServer();
-        return recordSummary;
-    } catch (error) {
-        console.error('サマリー取得エラー:', error);
-        // エラーの場合は空のサマリーを返す
-        return {
-            totalTypeByte: 0,
-            bestWPM: 0
-        };
-    }
-}`,
-"typescript"
-),
-new SourceCode(
-"putRecord",
-`// ゲーム記録を保存
-async putRecord(record: GameStats): Promise<void> {
-    // キャッシュを更新
-    this.lastRecord = record;
-
-    // ローカルサマリーを更新
-    if (this.recordSummary) {
-        this.recordSummary.totalTypeByte += record.correctTypes;
-        this.recordSummary.bestWPM = Math.max(
-            this.recordSummary.bestWPM,
-            record.wpm
-        );
-    }
-
-    // ログインしていなければサーバーには保存しない
-    if (!this.userState.isLoggedIn) return;
-
-    try {
-        const token = await this.getAuthToken();
-        if (!token) throw new Error();
-
-        const recordData = {
-            correctTypes: record.correctTypes,
-            mistypes: record.mistypes,
-            correctRate: record.correctRate,
-            timeRemaining: record.timeRemaining,
-            wpm: record.wpm,
-            totalTime: record.totalTime,
-            recordedAt: new Date().toISOString()
-        };
-
-        const response = await fetch(
-            \`\${Host.functions.href}/api/records\`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': \`Bearer \${token}\`
-            },
-            body: JSON.stringify(recordData)
-        });
-
-        if (!response.ok) {
-            throw new Error('ゲーム記録の保存に失敗しました');
-        }
-    } catch (error) {
-        console.error('記録保存エラー:', error);
-    }
-}`,
-"typescript"
-),
-new SourceCode(
-"functions-routing",
-`/* --------------------------------
-RESTful APIのルーティングを設定する
------------------------------------ */
-
-import { type Express } from 'express';
-
-import { test } from "./test";
-import { allowCors, authMiddleware } from "./auth";
-import { getUserData, setUserData, addGameRecord, getLatestGameRecords} from "./userData";
-
-export default function (app: Express) {
-    // 接続テスト用エンドポイント
-    app.get("/api/", test);
-
-    // // ユーザ登録用エンドポイント
-    // app.post("/api/signup", signup);
-
-    // // ユーザ認証用エンドポイント
-    // app.post("/api/login", login);
-
-    // ユーザデータ取得用エンドポイント
-    app.get("/api/user", allowCors, authMiddleware, getUserData);
-
-    // ユーザデータ更新用エンドポイント
-    app.post("/api/user", allowCors, authMiddleware, setUserData);
-
-    //ゲーム記録保存用エンドポイント
-    app.post("/api/records", allowCors, authMiddleware, addGameRecord);
-
-    //最新のゲーム記録取得用エンドポイント
-    app.get("/api/records/latest", allowCors, authMiddleware, getLatestGameRecords);
-}`,
-"typescript"
-),
-new SourceCode(
-"functions-middleware",
-`import type { Request, Response } from 'express';
-import { getApp } from 'firebase-admin/app';
-const app = getApp();
-
-// authの利用
-import { getAuth } from 'firebase-admin/auth';
-const auth = getAuth(app);
-
-// firestoreの利用
-// import { getFirestore } from 'firebase-admin/firestore';
-// const db = getFirestore(app);
-
-// 認証済みのリクエストかをチェックするミドルウェア
-export async function authMiddleware(req: Request, res: Response, next: Function) {
-    console.log('authMiddleware called');
-    try {
-        const authHeader = req.headers.authorization;
-        if (!authHeader || !authHeader.startsWith('Bearer ')) {
-            return res.status(401).json({ error: 'token missing' });
-        }
-
-        const idToken = authHeader.split('Bearer ')[1];
-        const decodedToken = await auth.verifyIdToken(idToken);
-        req.user = decodedToken; //user情報をリクエストに追加
-        return next(); 
-    } catch (error) {
-        return res.status(401).json({ error: 'invalid token' });
-    }
-}
-
-// 開発環境向けにクロス-オリジンリクエストを許可するミドルウェア
-export async function allowCors(req: Request, res: Response, next: Function) {
-    // ローカルホストの場合全てのポートを許可
-    console.log('allowing cors access');
-    res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:5000');
-    res.header('Access-Control-Allow-Methods', '*');
-    res.header('Access-Control-Allow-Headers', '*');
-    
-    return next();
-}`,
-"typescript"
-),
-new SourceCode(
-"getsetUserData",
-`async function getUserData(req: Request, res: Response) {
-    console.log('getUserData called');
-    try {
-        const userId = req.user?.uid;
-        if (!userId) {
-            return res.status(401).json({ error: 'missing credentials' });
-        }
-
-        const userDoc = await db.collection('users').doc(userId).get();
-
-        if (!userDoc.exists) {
-            return res.status(200).json({
-                setting: {
-                    timeLimitPresentation: true,
-                    BGM: true,
-                    typingSound: true,
-                    otherSoundEffect: true
-                },
-                records: {
-                    totalTypeByte: 0,
-                    bestWPM: 0
-                }
-            });
-        }
-
-        return res.status(200).json(userDoc.data());
-    } catch (error) {
-        return res.status(500).json({ error: 'internal server error' });
-    }
-}
-
-async function setUserData(req: Request, res: Response) {
-    console.log('setUserData called');
-    try {
-        const userId = req.user?.uid;
-        if (!userId) {
-            return res.status(401).json({ error: 'missing credentials' });
-        }
-        
-        const { setting, records } = req.body;
-
-        const updateData: any = {};
-
-        if (setting) {
-            updateData.setting = setting;
-        }
-
-        if (records) {
-            updateData.records = records;
-        }
-
-        await db.collection('users').doc(userId).set(updateData, { merge: true });
-
-        return res.status(200).json({ success: true });
-    } catch (error) {
-        return res.status(500).json({ error: 'internal server error' });
-    }    
-}`,
-"typescript"
-),
-new SourceCode(
-"addGetRecrd",
-`async function addGameRecord(req: Request, res: Response) {
-    console.log('addGameRecord called');
-    try {
-        const userId = req.user?.uid;
-        if (!userId) {
-            return res.status(401).json({ error: 'missing credentials' });
-        }
-
-        const gameRecord = req.body;
-
-        const recordWithTimestamp = {
-            ...gameRecord,
-            recordedAt: new Date()
-        };
-
-        const recordRef = await db.collection('users').doc(userId).collection('gameRecords').add(recordWithTimestamp);
-
-        const userRef = db.collection('users').doc(userId);
-        let totalTypeByte, bestWPM;
-
-        await db.runTransaction(async (transaction) => {
-            const userDoc = await transaction.get(userRef);
-            const userData = userDoc.data() || {};
-            const currentRecords = userData.records || { totalTypeByte: 0, bestWPM: 0 };
-
-            totalTypeByte = (currentRecords.totalTypeByte || 0) + gameRecord.correctTypes;
-            const byte = gameRecord.correctTypes;
-            bestWPM = Math.max(currentRecords.bestWPM || 0, byte);
-
-            transaction.set(userRef, {
-                records: {
-                    totalTypeByte,
-                    bestWPM
-                }
-            }, { merge: true });
-        });
-
-        return res.status(200).json({
-            success: true,
-            recordId: recordRef.id,
-            totalTypeByte,
-            bestWPM
-        });
-    } catch (error) {
-        return res.status(500).json({ error: 'internal server error' });
-    }
-}
-
-async function getLatestGameRecords(req: Request, res: Response) {
-    console.log('getLatestGameRecords called');
-    try {
-        const userId = req.user?.uid;
-        if (!userId) {
-            return res.status(401).json({ error: 'missing credentials' });
-        }
-
-        const recordsSnapshot = await db.collection('users').doc(userId).collection('gameRecords')
-            .orderBy('recordedAt', 'desc')
-            .limit(1)
-            .get();
-
-        if (recordsSnapshot.empty) {
-            return res.status(404).json({ error: 'record not found' });
-        }
-        
-        const latestRecord = recordsSnapshot.docs[0].data();
-        return res.status(200).json(latestRecord);
-    } catch (error) {
-        return res.status(500).json({ error: 'internal server error' });
-    }
-}`,
-"typescript"
-),
-new SourceCode(
-"problemType",
-`export class Token {
-  constructor(
-    public content: string,
-    public scope: Scope
-  ) {}
-  length(): number {
-    return this.content.length;
-  }
-  toString(): string {
-    return this.content;
-  }
-}
-
-// highlight.jsの字句解析情報を利用するためのhack
-type SerialToken = {
-    children: SerialToken[];
-    scope: string;
-} | string;
-type TokenTreeEmitter = {rootNode: {children: SerialToken[]}};
-
-
-// 問題データの型定義
-export class SourceCode {
-  public tokens: Token[];
-  
-  constructor(public id: string, public content: string, public language: string) {
-    // ちょっとhackyすぎ？
-    const tokenTree = hljs.highlight(content, { language })._emitter as unknown as TokenTreeEmitter;
-    this.tokens = [];
-    for (const token of tokenTree.rootNode.children) {
-      this.pushToken(token);
-    }
+    const text = new Text(char, style);
+    text.x = x;
+    text.y = y;
+    this.textContainer.addChild(text);
   }
 
-  // flattenのため再帰関数を使用
-  private pushToken(token: SerialToken, superScope?: Scope) {
-    // highlight.jsのscope -> 独自のScope(上で定めたもの)へ
-    if (typeof token === "string") {
-      this.tokens.push(new Token(token, superScope || Scope.PLANE));
-      return;
-    }
+  private readonly firstLetterPosX = 20;
+  private readonly firstLinePosY = 20;  
 
-    for (const child of token.children) {
-      this.pushToken(child, scopeAsEnum(token.scope));
-    }
-  }
-
-  generateProblem(): Problem {
-    return new Problem(this);
-  }
-}
-export class Problem {
-  private tokenIndex: number = 0;
-  private charIndex: number = 0;
-  public completed: boolean = false;
-  constructor(
-    public source: SourceCode,
-  ) {
-    // 初期状態でスキップするべき文字・トークンを飛ばす
-    this.skip();
-  }
-
-  private proceedOneToken() {
-    if (this.completed) return;
-    this.tokenIndex++;
-    this.charIndex = 0;
-    // トークンが無くなったらcompletedを立てる．
-    if (this.tokenIndex >= this.source.tokens.length) {
-      this.completed = true;
-      this.tokenIndex = this.source.tokens.length - 1; // 最後のトークンに留まる
-      this.charIndex = this.source.tokens[this.tokenIndex].length() - 1; // 最後の文字に留まる
-    }
-  }
-
-  get currentToken(): Token {
-    return this.source.tokens[this.tokenIndex];
-  }
-
-  private proceedOneChar() {
-    if (this.completed) return;
-    this.charIndex++;
-    // charIndexがトークンをオーバーしたら次のトークンへ
-    if (this.charIndex >= this.source.tokens[this.tokenIndex].length()) {
-      this.proceedOneToken();
-    }
-  }
-
-  get currentChar(): string {
-    if (this.completed) return "";
-    return this.source.tokens[this.tokenIndex].content[this.charIndex];
-  }
-
-  private get currentCharShouldBeSkipped() {
-    return [
-      " ", "\t", "\n", undefined // undefinedは空のトークンに入ったときに対応
-    ].includes(this.currentChar)
-  }
-  private get currentTokenShouldBeSkipped() {
-    return [Scope.comment].includes(this.currentToken.scope);
-  }
-
-  private skip() {
-    // スキップ条件が満たされている限り進め続ける
-    while (
-      this.currentCharShouldBeSkipped
-      || this.currentTokenShouldBeSkipped
-    ) {
-      // 空白・タブ文字・改行は飛ばす
-      while (this.currentCharShouldBeSkipped) {
-        this.proceedOneChar();
-      }
-      // コメントトークンは飛ばす
-      while (this.currentTokenShouldBeSkipped) {
-        this.proceedOneToken();
-      }
-    }
-  }
-
-  proceed(): void {
-    if (this.completed) return;
-    this.proceedOneChar(); // とりあえず一文字進める
-
-    this.skip(); // スキップするべき文字・トークンを飛ばす
-  }
-
-  charAtCursor(): string {
-    return this.currentChar;
-  }
-  tokensBeforeCursor(): Token[] {
-    return [
-      ...this.source.tokens.slice(0, this.tokenIndex), 
-      new Token(
-        this.currentToken.content.slice(0, this.charIndex),
-        this.currentToken.scope,
-      ) // 最後のトークンが入力中のトークン
-    ]
-  }
-  tokensAfterCursor() {
-    return [
-      new Token( // 最初のトークンが入力中のトークン
-        this.currentToken.content.slice(this.charIndex+1),
-        this.currentToken.scope
-      ),
-      ...this.source.tokens.slice(this.tokenIndex + 1)
-    ]
-  }
-}`,
-"typescript"
-),
-new SourceCode(
-"game_startGame",
-`// ゲーム開始
-private startGame(): void {
-  if (this.gameStarted()) return;
-  
-  this.setGameStarted(true);
-  this.setGameEnded(false);
-  
-  // タイマー開始
-  this.gameTimer = window.setInterval(() => {
-    const currentStats = this.stats();
-    if (
-      // timelimitが有効な場合のみタイマーが0以下になったら終了
-      this.gameSetting?.timeLimitPresentation
-      && currentStats.timeRemaining <= 0
-    ) {
-      this.endGame(this.stats());
-      return;
-    }
-    
-    this.setStats(prev => ({
-      ...prev,
-      timeRemaining: prev.timeRemaining - 1
-    }));
-    this.setStats(prev => ({
-      ...prev,
-      wpm: Math.round(60 * prev.correctTypes / (prev.totalTime - prev.timeRemaining))
-    }));
-  }, 1000);
-}`,
-"typescript"
-),
-new SourceCode(
-"game_handleKeyInput",
-`// キー入力処理
-private handleKeyInput(event: KeyboardEvent): void {
-  if (!this.gameStarted() || this.gameEnded()) {
-    if (event.key === 'Enter' && !this.gameStarted()) {
-      this.startGame();
-    }
-    if (event.key === 'Enter' && this.gameEnded()) {
-      this.manager.changeSceneTo(SceneSig.selection);
-    }
-    return;
-  }
-
-  // 特殊キーは無視
-  if (event.key.length > 1 && event.key !== 'Tab' || event.key ===' ') return;
-  
-  event.preventDefault();
-  
-  const targetChar = this.problemData.charAtCursor();
-  
-  if (event.key === targetChar) {
-    // 正解
-    this.problemData.proceed();
-    this.setStats(prev => ({
-      ...prev,
-      correctTypes: prev.correctTypes + 1
-    }));
-    
-    // 問題完了チェック
-    if (this.problemData.completed) {
-      this.endGame(this.stats());
-    }
-  } else {
-    // ミス
-    this.setStats(prev => ({
-      ...prev,
-      mistypes: prev.mistypes + 1
-    }));
-  }
-  this.setStats(prev => ({
-      ...prev,
-      correctRate: Math.round(100 * prev.correctTypes / (prev.correctTypes + prev.mistypes))
-  }));  
   // 表示更新
-  this.updateDisplay();
-}`,
-"typescript"
-),
-new SourceCode(
-"updateDisplay",
-`private readonly fontSize = 20;
-private readonly lineHeight = 24;
-private readonly charWidth = 12;
+  private updateDisplay(): void {
+    console.log(\`updating display \${this.sceneSignature}...\`);
+    if (!this.textContainer) return;
+    
+    // テキストコンテナをクリア
+    this.textContainer.removeChildren().forEach(child => {
+      child.destroy();
+    });
+    this.backgroundContainer.removeChildren().forEach(child => {
+      child.destroy();
+    });
+    
+    let currentX = this.firstLetterPosX;
+    let currentY = this.firstLinePosY;
 
-// 文字の表示処理
-private putCharAt(x: number, y: number, char: string, charWidth: number, backgroundColor: number, textColor: number): void {
-  // 背景矩形
-  if (backgroundColor !== 0x000000) {
-    const bg = new Graphics();
-    bg.rect(x - 2, y - 2, charWidth, this.lineHeight);
-    bg.fill(backgroundColor);
-    this.backgroundContainer.addChild(bg);
-  }
-  
-  // 文字
-
-  const style = new TextStyle({
-    fontFamily: 'Consolas',
-    fontSize: this.fontSize,
-    fill: textColor,
-  });
-
-  const text = new Text(char, style);
-  text.x = x;
-  text.y = y;
-  this.textContainer.addChild(text);
-}
-
-private readonly firstLetterPosX = 20;
-private readonly firstLinePosY = 20;  
-
-// 表示更新
-private updateDisplay(): void {
-  console.log(\`updating display \${this.sceneSignature}...\`);
-  if (!this.textContainer) return;
-  
-  // テキストコンテナをクリア
-  this.textContainer.removeChildren();
-  this.backgroundContainer.removeChildren();
-  
-  let currentX = this.firstLetterPosX;
-  let currentY = this.firstLinePosY;
-
-  // ProblemDataから現在位置より前の文字を取得
-  for (const token of this.problemData.tokensBeforeCursor()) {
-    for (const char of token.content) {
-      // 改行処理
-      if (char === '\n') {
-        currentX = this.firstLetterPosX;
-        currentY += this.lineHeight;
-        continue;
+    // ProblemDataから現在位置より前の文字を取得
+    for (const token of this.problemData.tokensBeforeCursor()) {
+      for (const char of token.content) {
+        // 改行処理
+        if (char === '\n') {
+          currentX = this.firstLetterPosX;
+          currentY += this.lineHeight;
+          continue;
+        }
+        // 文字の背景色を決定
+        const backgroundColor = 0x22C55E; // 緑
+        const textColor = 0x000000; // 黒
+        // マルチバイト文字の場合は幅を2倍にする
+        const width = this.charWidth * (this.isJapanese(char) ? 2 : 1);
+        this.putCharAt(currentX, currentY, char, width, backgroundColor, textColor);
+        currentX += width;
       }
-      // 文字の背景色を決定
-      const backgroundColor = 0x22C55E; // 緑
-      const textColor = 0x000000; // 黒
+    }
+
+    // 現在入力位置を記録
+    const cursorPositionX = currentX;
+    const cursorPositionY = currentY;
+    // 現在の文字を取得 改行は取得され得ないので，改行処理は入れない．
+    {
+      const backgroundColor = 0xEAB308; // 黄色
+      const textColor = 0xeeeeee; // 灰色
+      const currentChar = this.problemData.charAtCursor();
       // マルチバイト文字の場合は幅を2倍にする
-      const width = this.charWidth * (this.isJapanese(char) ? 2 : 1);
-      this.putCharAt(currentX, currentY, char, width, backgroundColor, textColor);
+      const width = this.charWidth * (this.isJapanese(currentChar) ? 2 : 1);
+      this.putCharAt(currentX, currentY, currentChar, width, backgroundColor, textColor);
       currentX += width;
     }
-  }
 
-  // 現在入力位置を記録
-  const curosrPositionX = currentX;
-  const cursorPositionY = currentY;
-  // 現在の文字を取得 改行は取得され得ないので，改行処理は入れない．
-  {
-    const backgroundColor = 0xEAB308; // 黄色
-    const textColor = 0xeeeeee; // 灰色
-    const currentChar = this.problemData.charAtCursor();
-    // マルチバイト文字の場合は幅を2倍にする
-    const width = this.charWidth * (this.isJapanese(currentChar) ? 2 : 1);
-    this.putCharAt(currentX, currentY, currentChar, width, backgroundColor, textColor);
-    currentX += width;
-  }
-
-  for (const token of this.problemData.tokensAfterCursor()) {
-    for (const char of token.content) {
-      // 改行処理
-      if (char === '\n') {
-        currentX = this.firstLetterPosX;
-        currentY += this.lineHeight;
-        continue;
+    for (const token of this.problemData.tokensAfterCursor()) {
+      for (const char of token.content) {
+        // 改行処理
+        if (char === '\n') {
+          currentX = this.firstLetterPosX;
+          currentY += this.lineHeight;
+          continue;
+        }
+        const backgroundColor = 0x000000; // 透明
+        const textColor = 0xFFFFFF; // 白
+      // マルチバイト文字の場合は幅を2倍にする
+        const width = this.charWidth * (this.isJapanese(char) ? 2 : 1);
+        this.putCharAt(currentX, currentY, char, width, backgroundColor, textColor);
+        currentX += width;
       }
-      const backgroundColor = 0x000000; // 透明
-      const textColor = 0xFFFFFF; // 白
-    // マルチバイト文字の場合は幅を2倍にする
-      const width = this.charWidth * (this.isJapanese(char) ? 2 : 1);
-      this.putCharAt(currentX, currentY, char, width, backgroundColor, textColor);
-      currentX += width;
     }
+
+    const viewportHeight = this.pixiApp.renderer.height;
+    const scrollOffsetY = Math.max(0, cursorPositionY - viewportHeight / 2);
+
+    this.textContainer.y = -scrollOffsetY + 20;
+    this.backgroundContainer.y = -scrollOffsetY + 20;
+
+    const viewportWidth = this.pixiApp.renderer.width;
+    const scrollOffsetX = Math.max(0, cursorPositionX - viewportWidth / 1.6);
+
+    this.textContainer.x = -scrollOffsetX + 20;
+    this.backgroundContainer.x = -scrollOffsetX + 20;
+
   }
 
-  const viewportHeight = this.pixiApp.renderer.height;
-  const scrollOffsetY = Math.max(0, cursorPositionY - viewportHeight / 2);
+  // https://stackoverflow.com/questions/4877326/how-can-i-tell-if-a-string-contains-multibyte-characters-in-javascript
+  private isJapanese(testee: string): boolean {
+    return /[\\u3041-\\u3096\\u30A1-\\u30FA]|[ー々〇〻\\u3400-\\u9FFF\\uF900-\\uFAFF]|[\\uD840-\\uD87F][\\uDC00-\\uDFFF]/
+      .test(testee);
+  }
 
-  this.textContainer.y = -scrollOffsetY + 40;
-  this.backgroundContainer.y = -scrollOffsetY + 40;
+  private keyEventHandler?: (e: KeyboardEvent) => void;
+  MiddleCanvas(): JSXElement {
+    let containerDiv!: HTMLDivElement;
 
-  const viewportWidth = this.pixiApp.renderer.width;
-  const scrollOffsetX = Math.max(0, curosrPositionX - viewportWidth / 2);
+    onMount(() => {
+      if (containerDiv && this.pixiApp.canvas) {
+        // canvasをappendChild
+        containerDiv.appendChild(this.pixiApp.canvas);
 
-  this.textContainer.x = -scrollOffsetX + 20;
-  this.backgroundContainer.x = -scrollOffsetX + 20;
+        const pixiContainer = this.makePixiAppContent();
+        this.arrangeContent(pixiContainer, containerDiv);
 
+        if (this.keyEventHandler) {
+          window.removeEventListener('keydown', this.keyEventHandler);
+        }
+        this.keyEventHandler = (e) => this.handleKeyInput(e);
+        window.addEventListener('keydown', this.keyEventHandler);
+
+        this.updateDisplay();
+
+        window.addEventListener('resize', () => {
+          this.arrangeContent(pixiContainer, containerDiv);
+        });
+      }
+    });
+
+    return (
+      <div
+        ref={el => containerDiv = el!}
+        style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden'}}
+      />
+    );
+  }
+
+  // PixiAppのコンテンツを作成する
+  makePixiAppContent(): Container {
+    const container = new Container();
+    this.pixiApp.stage.addChild(container);
+
+    // 背景コンテナ（ハイライト用）
+    this.backgroundContainer = new Container();
+    container.addChild(this.backgroundContainer);
+    
+    // テキストコンテナ
+    this.textContainer = new Container();
+    container.addChild(this.textContainer);
+
+    return container;
+  }
+
+  // PixiAppのコンテンツを配置する
+  arrangeContent(contentContainer: Container, canvasHolder: HTMLElement): void {
+    this.pixiApp.renderer.resize(
+      canvasHolder.clientWidth,
+      canvasHolder.clientHeight
+    );
+    
+  if (this.pixiApp.canvas) {
+    this.pixiApp.canvas.style.width = '100%';
+    this.pixiApp.canvas.style.height = '100%';
+  }
+
+    // コンテンツを中央に配置
+    const padding = 0;
+    contentContainer.x = padding;
+    // contentContainer.y = padding;
+    this.updateDisplay();
+  }
+
+  // コンポーネントを作成する
+  makeComponent(): JSXElement {
+    const [num1, setNum1] = createSignal(0);
+    const [num2, setNum2] = createSignal(0);
+    setInterval(() => setNum1((num1() + 10) % 255), 1000)
+    setInterval(() => setNum2((num2() + 5) % 255), 1000)
+    return <>
+      <div class={styles.whole}>
+        <div class={styles.whole2}>
+          {/* <img src={metype} style={{"height": "12vh", "border-radius": "8px"}}/> */}
+          <div style={{"color": \`rgb(\${num1()}, 180, \${num2()})\`}}>
+            <h1>METYPE</h1>
+          </div>
+          <div class={styles.situation}>
+            <div class={styles.situationExplain}>
+              <div class={styles.situationExplainTag}>正解</div>
+              <div style={{"font-size": "24px", "color": "#FCBAD3", "font-weight": "bold"}}>
+                {this.stats().correctTypes}
+              </div>
+            </div>
+            <div class={styles.situationExplain}>
+              <div class={styles.situationExplainTag}>ミス</div>
+              <div style={{"font-size": "24px", "color": "#FFFFD2", "font-weight": "bold"}}>
+                {this.stats().mistypes}
+              </div>
+            </div>
+            <div class={styles.situationExplain}>
+              <div class={styles.situationExplainTag}>正解率</div>
+              <div style={{"font-size": "24px", "color": "#A8D8EA", "font-weight": "bold"}}>
+                {this.stats().correctRate}%
+              </div>
+            </div>
+            <div class={styles.situationExplain}>
+              <div class={styles.situationExplainTag}>WPM</div>
+              <div style={{"font-size": "24px", "color": "#AA96DA", "font-weight": "bold"}}>
+                {this.stats().wpm}
+              </div>
+            </div>
+            <div class={styles.situationExplain}>
+              <div class={styles.situationExplainTag}>残り時間</div>
+              <div style={{"font-size": "24px", "color": "#81f1ad", "font-weight": "bold"}}>
+                {this.stats().timeRemaining}s
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {!this.gameStarted() && !this.gameEnded() && (
+          <div class={styles.start}>
+              <div class={styles.startText}>
+                <p><span class={styles.bigkey}>Enter</span>キーを押してゲームを開始して下さい</p>
+              </div>
+              <div class={styles.startText}>
+                <p>制限時間：{this.stats().totalTime}秒</p>
+              </div>
+              <div style={{"font-weight": "bold", "color": "#eee", "margin-top": "20px", "font-size": "1.5vw"}}>
+                <p>ゲーム中、<span class={styles.smallkey}>Space</span>・<span class={styles.smallkey}>Enter</span>キーを押す必要はありません</p>
+              </div>
+          </div>
+        )}
+
+        {this.gameEnded() && (
+          
+          <div class={styles.end}>
+            <div class={styles.containerStyle}>
+                <div class={styles.resultStyle}> &lt;Result&gt; </div>
+                <div>
+                    <div class={styles.textStyle}> correct = <span class={styles.correct}>{this.stats().correctTypes}<span class={styles.Hover}>(property) correct: number</span> </span>byte;</div>
+                </div>
+                <div>
+                    <div class={styles.textStyle}> miss = <span class={styles.miss}>{this.stats().mistypes}<span class={styles.Hover}>(property) miss: number</span> </span>byte;</div>
+                </div>
+                <div>
+                    <div class={styles.textStyle}> correctRate = <span class={styles.correctRate}>{this.stats().correctRate}<span class={styles.Hover}>(property) correctRate: number</span> </span>%;</div>
+                </div>
+                <div>
+                    <div class={styles.textStyle}> WPM = <span class={styles.wpm}>{this.stats().wpm}<span class={styles.Hover}>(property) WPM: number</span></span>;</div>
+                </div>
+                <div class={styles.resultStyle}> &lt;/Result&gt; </div>
+            </div>
+            <div class={styles.outerButton}>
+                <button class={styles.homeButton} type="button" onclick={() => this.manager.changeSceneTo(SceneSig.selection)}>
+                    <span>return</span> home;
+                </button>
+            </div>
+          </div>
+        )}
+
+        <div class={styles.canvas}>
+          {this.MiddleCanvas()}
+        </div>
+      </div>
+    </>
+  }
 }`,
-"typescript"
+"typescript",
 )
 ]
 
