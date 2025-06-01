@@ -16,47 +16,21 @@ export default class RecordScene extends SceneBase {
     super(manager, SceneSig.record);
   }
 
-  // ✅ 記録データを読み込む
+  // pixiAppの初期化をする
   async preload(): Promise<void> {
     console.log(`Preloading ${this.sceneSignature}...`);
-
-    const summary = await userDataManager.getRecordSummary();
-    this.bestScore = summary.bestWPM;
-    this.totalType = summary.totalTypeByte;
 
     const pixiApp = new PixiApp();
     await pixiApp.init({ backgroundAlpha: 0 });
     this.pixiApp = pixiApp;
   }
 
-  MiddleCanvas(): JSXElement {
-    const pixiContainer = this.makePixiAppContent();
-    const canvasHolder = (
-      <div style={{ height: "100%", width: "100%" }}>{this.pixiApp.canvas}</div>
-    ) as HTMLElement;
-
-    onMount(() => {
-      this.arrangeContent(pixiContainer, canvasHolder);
-      window.addEventListener("resize", () => {
-        this.arrangeContent(pixiContainer, canvasHolder);
-      });
-    });
-
-    return canvasHolder;
-  }
-
-  makePixiAppContent() {
-    const container = new Container();
-
-    this.pixiApp.stage.addChild(container);
-    return container;
-  }
-
-  arrangeContent(contentContainer: Container, canvasHolder: HTMLElement) {
-    this.pixiApp.renderer.resize(
-      canvasHolder.clientWidth,
-      canvasHolder.clientHeight
-    );
+  // ✅ シーンの表示前に毎回記録データを読み込む
+  async load(): Promise<void> {
+    const summary = await userDataManager.getRecordSummary();
+    console.log(summary);
+    this.bestScore = summary.bestWPM;
+    this.totalType = summary.totalTypeByte;
   }
 
     // ✅ 記録を表示する

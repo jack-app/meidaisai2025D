@@ -44,6 +44,36 @@ export default class UserDataManager implements IUserDataManager {
         this.listeners.forEach((listener) => listener(state));
     }
 
+    private async fetchDataFromServer() {
+        const token = await this.getAuthToken();
+        if (!token) throw new Error('認証トークンの取得に失敗しました');
+
+        const response = await fetch(
+            `${Host.functions.href}/api/user`, {
+            headers: {
+                'Authorization': `Bearer ${token}`
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error('ユーザー設定の取得に失敗しました');
+        }
+
+        const data = await response.json();
+        this.userSetting = data.setting ?? {
+            timeLimitPresentation: true,
+            BGM: true,
+            typingSound: true,
+            otherSoundEffect: true
+        };
+        this.recordSummary = data.records ?? {
+            totalTypeByte: 0,
+            bestWPM: 0
+        };
+
+        return {userSetting: this.userSetting!, recordSummary: this.recordSummary!};
+    }
+
     // SolidJSのストアを使ってユーザー状態を提供
     useUserState() {
         const [state, setState] = createStore<UserState>(this.userState);
@@ -98,38 +128,10 @@ export default class UserDataManager implements IUserDataManager {
             };
         }
 
+        // ログインしている場合はサーバに問い合わせて返す
         try {
-            const token = await this.getAuthToken();
-            if (!token) throw new Error('認証トークンの取得に失敗しました');
-
-            const response = await fetch(
-                `${Host.functions.href}/api/user`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('ユーザー設定の取得に失敗しました');
-            }
-
-            const data = await response.json();
-            this.userSetting = data.setting
-            this.recordSummary = data.records || {
-                totalTypeByte: 0,
-                bestWPM: 0
-            };
-
-            if (!this.userSetting) {
-                this.userSetting = {
-                    timeLimitPresentation: true,
-                    BGM: true,
-                    typingSound: true,
-                    otherSoundEffect: true
-                };
-            }
-
-            return this.userSetting;
+            const {userSetting} = await this.fetchDataFromServer();
+            return userSetting;
         } catch (error) {
             console.error('設定取得エラー:', error);
             // エラーの場合はデフォルト設定を返す
@@ -187,32 +189,10 @@ export default class UserDataManager implements IUserDataManager {
             };
         }
 
+        // ログインしていればサーバに問い合わせて返す
         try {
-            const token = await this.getAuthToken();
-            if (!token) throw new Error('認証トークンの取得に失敗しました');
-
-            const response = await fetch(
-                `${Host.functions.href}/api/user`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (!response.ok) {
-                throw new Error('記録サマリーの取得に失敗しました');
-            }
-
-            const data = await response.json();
-            this.recordSummary = data.recordSummary
-
-            if (!this.recordSummary) {
-                this.recordSummary = {
-                    totalTypeByte: 0,
-                    bestWPM: 0
-                };
-            }
-
-            return this.recordSummary;
+            const { recordSummary } = await this.fetchDataFromServer();
+            return recordSummary;
         } catch (error) {
             console.error('サマリー取得エラー:', error);
             // エラーの場合は空のサマリーを返す
