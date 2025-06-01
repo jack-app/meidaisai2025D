@@ -1,4 +1,4 @@
-import { onMount, createSignal, type JSXElement, type Accessor, type Signal } from "solid-js";
+import { onMount, createSignal, type JSXElement, type Accessor, type Signal, onCleanup, createEffect } from "solid-js";
 import SceneBase from "./fundation/sceneBase";
 import type SceneManager from "./fundation/sceneManager";
 import { Container, Application as PixiApp, Text, TextStyle, Graphics } from 'pixi.js'
@@ -157,7 +157,7 @@ export default class GameScene extends SceneBase {
         ...prev,
         correctRate: Math.round(100 * prev.correctTypes / (prev.correctTypes + prev.mistypes))
     }));  
-    
+
     // 問題完了チェック
     if (this.problemData.completed) {
       this.endGame();
@@ -285,10 +285,11 @@ export default class GameScene extends SceneBase {
       .test(testee);
   }
 
-  private keyEventHandler?: (e: KeyboardEvent) => void;
   MiddleCanvas(): JSXElement {
     let containerDiv!: HTMLDivElement;
 
+    let keyEventHandler: ((e: KeyboardEvent) => void) | undefined;
+    let resizeEventHandler: (() => void) | undefined;
     onMount(() => {
       if (containerDiv && this.pixiApp.canvas) {
         // canvasをappendChild
@@ -298,18 +299,28 @@ export default class GameScene extends SceneBase {
         this.arrangeContent(pixiContainer, containerDiv);
         this.updateDisplay();
 
-        if (this.keyEventHandler) {
-          window.removeEventListener('keydown', this.keyEventHandler);
-        }
-        this.keyEventHandler = (e) => this.handleKeyInput(e);
-        window.addEventListener('keydown', this.keyEventHandler);
+        keyEventHandler = (e) => this.handleKeyInput(e);
+        window.addEventListener('keydown', keyEventHandler);
 
-        window.addEventListener('resize', () => {
+        resizeEventHandler = () => {
           this.arrangeContent(pixiContainer, containerDiv);
           this.updateDisplay();
-        });
+        };
+        window.addEventListener('resize', resizeEventHandler);
       }
     });
+
+    onCleanup(() => {
+      if (resizeEventHandler) {
+        window.removeEventListener('resize', resizeEventHandler);
+      }
+    })
+
+    createEffect(() => {
+      if (this.gameEnded() && keyEventHandler) {
+        window.removeEventListener('keydown', keyEventHandler);
+      }
+    })
 
     return (
       <div

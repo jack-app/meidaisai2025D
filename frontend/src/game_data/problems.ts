@@ -147,13 +147,15 @@ export class Problem {
   }
 
   private get currentCharShouldBeSkipped() {
-    return (
+    return !this.completed && (
       this.currentChar === undefined // undefinedは長さ0のtokenに対応
       || !/[\u0021-\u007F]/.test(this.currentChar) // 通常の英数記号以外はスキップ
     );
   }
   private get currentTokenShouldBeSkipped() {
-    return [Scope.comment].includes(this.currentToken.scope);
+    return !this.completed && (
+      [Scope.comment].includes(this.currentToken.scope)
+    );
   }
 
   private skip() {
