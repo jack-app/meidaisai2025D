@@ -6,10 +6,6 @@ const app = getApp();
 import { getAuth } from 'firebase-admin/auth';
 const auth = getAuth(app);
 
-// firestoreの利用
-// import { getFirestore } from 'firebase-admin/firestore';
-// const db = getFirestore(app);
-
 // 認証済みのリクエストかをチェックするミドルウェア
 export async function authMiddleware(req: Request, res: Response, next: Function) {
     console.log('authMiddleware called');
@@ -39,13 +35,3 @@ export async function allowCors(req: Request, res: Response, next: Function) {
     
     return next();
 }
-
-// function signup(req: Request, res: Response) {
-
-// }
-
-// function login(req: Request, res: Response) {
-
-// }
-
-// export {signup, login}
