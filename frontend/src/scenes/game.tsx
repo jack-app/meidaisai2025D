@@ -153,14 +153,16 @@ export default class GameScene extends SceneBase {
         mistypes: prev.mistypes + 1
       }));
     }
-    // 問題完了チェック
-    if (this.problemData.completed) {
-      this.endGame();
-    }
     this.setStats(prev => ({
         ...prev,
         correctRate: Math.round(100 * prev.correctTypes / (prev.correctTypes + prev.mistypes))
     }));  
+    
+    // 問題完了チェック
+    if (this.problemData.completed) {
+      this.endGame();
+      return; // 完了していたら表示更新はしない
+    }
     // 表示更新
     this.updateDisplay();
   }
@@ -294,6 +296,7 @@ export default class GameScene extends SceneBase {
 
         const pixiContainer = this.makePixiAppContent();
         this.arrangeContent(pixiContainer, containerDiv);
+        this.updateDisplay();
 
         if (this.keyEventHandler) {
           window.removeEventListener('keydown', this.keyEventHandler);
@@ -301,10 +304,9 @@ export default class GameScene extends SceneBase {
         this.keyEventHandler = (e) => this.handleKeyInput(e);
         window.addEventListener('keydown', this.keyEventHandler);
 
-        this.updateDisplay();
-
         window.addEventListener('resize', () => {
           this.arrangeContent(pixiContainer, containerDiv);
+          this.updateDisplay();
         });
       }
     });
@@ -340,16 +342,15 @@ export default class GameScene extends SceneBase {
       canvasHolder.clientHeight
     );
     
-  if (this.pixiApp.canvas) {
-    this.pixiApp.canvas.style.width = '100%';
-    this.pixiApp.canvas.style.height = '100%';
-  }
+    if (this.pixiApp.canvas) {
+      this.pixiApp.canvas.style.width = '100%';
+      this.pixiApp.canvas.style.height = '100%';
+    }
 
     // コンテンツを中央に配置
     const padding = 0;
     contentContainer.x = padding;
     // contentContainer.y = padding;
-    this.updateDisplay();
   }
 
   // コンポーネントを作成する
