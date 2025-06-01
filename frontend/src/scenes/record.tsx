@@ -7,7 +7,7 @@ import { userDataManager } from "../const";
 
 export default class RecordScene extends SceneBase {
     private pixiApp!: PixiApp;
-    private bestScore: number = 0;
+    private bestWPM: number = 0;
     private totalType: number = 0;
     private CorrectType: number=0;
 
@@ -29,7 +29,7 @@ export default class RecordScene extends SceneBase {
   async load(): Promise<void> {
     const summary = await userDataManager.getRecordSummary();
     console.log(summary);
-    this.bestScore = summary.bestWPM;
+    this.bestWPM = summary.bestWPM;
     this.totalType = summary.totalTypeByte;
   }
 
@@ -67,7 +67,7 @@ export default class RecordScene extends SceneBase {
                 "top":'11vh',
                 "left":'10vw', 
             }}>
-                <span style="color:#00CA82">2</span>&nbsp;&nbsp;&nbsp;<span style="color:#1E7FFC">best_score</span> = {this.bestScore} ;
+                <span style="color:#00CA82">2</span>&nbsp;&nbsp;&nbsp;<span style="color:#1E7FFC">best_wpm</span> = {this.bestWPM} ;
             </p> 
             <p style={{
                 "font-weight":'bold',
