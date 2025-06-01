@@ -4,7 +4,7 @@ import type SceneManager from "./fundation/sceneManager";
 import { Container, Application as PixiApp, Text, TextStyle, Graphics } from 'pixi.js'
 import SceneSig from "./fundation/signatures";
 import styles from "./game.module.css";
-import { type GameStats } from "../data_interface/user_data/types";
+import { type GameStats, type UserSetting } from "../data_interface/user_data/types";
 import { userDataManager, Host } from "../const.ts";
 import metype from "/images/METYPE.png";
 
@@ -32,6 +32,7 @@ export default class GameScene extends SceneBase {
   }
   private pixiApp!: PixiApp;
   private problemData!: Problem;
+  private gameSetting?: UserSetting;
   /** @deprecated problemDataが現在位置の情報を持つようになったためdeprecated */
   private currentPosition = 0;
   private textContainer!: Container;
@@ -65,14 +66,13 @@ export default class GameScene extends SceneBase {
     await pixiApp.init({ 
       backgroundAlpha: 0 
     })
-
-    await Promise.all([
-      (async () => {
-        // 問題データの読み込み
-        this.problemData = GameDataProvider.getProblem();
-      })(),
-    ]);
     this.pixiApp = pixiApp;
+  }
+
+  async load(): Promise<void> {
+    this.problemData = GameDataProvider.getProblem();
+    this.gameSetting = await userDataManager.getUserSetting();
+    console.log(this.gameSetting);
   }
 
   // ゲーム開始
@@ -85,15 +85,18 @@ export default class GameScene extends SceneBase {
     // タイマー開始
     this.gameTimer = window.setInterval(() => {
       const currentStats = this.stats();
-      if (currentStats.timeRemaining <= 0) {
+      if (
+        // timelimitが有効な場合のみタイマーが0以下になったら終了
+        this.gameSetting?.timeLimitPresentation
+        && currentStats.timeRemaining <= 0
+      ) {
         this.endGame(this.statsSignal[0]());
         return;
       }
       
       this.setStats(prev => ({
         ...prev,
-        // timeRemaining: prev.timeRemaining - 6
-                timeRemaining: prev.timeRemaining 
+        timeRemaining: prev.timeRemaining - 1
       }));
       this.setStats(prev => ({
         ...prev,
