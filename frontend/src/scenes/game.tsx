@@ -12,7 +12,6 @@ import { render } from "solid-js/web";
 import { Problem } from "../game_data/problems.ts";
 import SourceCodeInstances from "../game_data/instances.ts";
 
-// ゲームデータプロバイダーのモック
 class GameDataProvider {
   static getProblem(): Problem {
     // ProblemInstancesからランダムに問題を取得して返す．
