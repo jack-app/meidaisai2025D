@@ -18,6 +18,9 @@ export default function Align(prop: AlignProps) {
         style={{
             width: '100%',
             height: '100%',
+            display: 'flex',
+            "justify-content": prop.horizontal,
+            "align-items": prop.vertical,
             "place-content": prop.horizontal,
             "place-items": prop.vertical,
         }}
