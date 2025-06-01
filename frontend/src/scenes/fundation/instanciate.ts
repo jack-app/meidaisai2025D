@@ -5,7 +5,6 @@ import GameScene from "../game";
 import RecordScene from "../record";
 import SelectionScene from "../selection";
 import SettingScene from "../setting";
-import ResultScene from "../result";
 import TitleScene from "../title";
 
 export default function instanciateAllScenes(manager: SceneManager) {
@@ -14,7 +13,6 @@ export default function instanciateAllScenes(manager: SceneManager) {
     new ExplanationScene(manager);
     new GameScene(manager);
     new RecordScene(manager);
-    new ResultScene(manager);
     new SelectionScene(manager);
     new SettingScene(manager);
     new TitleScene(manager);

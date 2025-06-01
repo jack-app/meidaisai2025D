@@ -1,8 +1,8 @@
 import { onMount, type JSXElement } from "solid-js";
-import SceneBase from "./fundation/sceneBase";
-import type SceneManager from "./fundation/sceneManager";
+import SceneBase from "./fundation/sceneBase.tsx";
+import type SceneManager from "./fundation/sceneManager.ts";
 import { Container, Application as PixiApp } from 'pixi.js';
-import SceneSig from "./fundation/signatures";
+import SceneSig from "./fundation/signatures.ts";
 import  styles  from "./result.module.css";
 import stats from "./game.tsx"
 import GameScene from "./game.tsx";
