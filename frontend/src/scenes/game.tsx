@@ -76,7 +76,9 @@ export default class GameScene extends SceneBase {
     });
     this.setGameEnded(false);
     this.setGameStarted(false);
-    this.pixiApp.stage.removeChildren();
+    this.pixiApp.stage.removeChildren().forEach(child => {
+      child.destroy();
+    });;
   }
 
 
@@ -203,8 +205,12 @@ export default class GameScene extends SceneBase {
     if (!this.textContainer) return;
     
     // テキストコンテナをクリア
-    this.textContainer.removeChildren();
-    this.backgroundContainer.removeChildren();
+    this.textContainer.removeChildren().forEach(child => {
+      child.destroy();
+    });
+    this.backgroundContainer.removeChildren().forEach(child => {
+      child.destroy();
+    });
     
     let currentX = this.firstLetterPosX;
     let currentY = this.firstLinePosY;
