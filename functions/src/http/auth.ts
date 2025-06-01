@@ -12,6 +12,7 @@ const auth = getAuth(app);
 
 // 認証済みのリクエストかをチェックするミドルウェア
 export async function authMiddleware(req: Request, res: Response, next: Function) {
+    console.log('authMiddleware called');
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -20,12 +21,23 @@ export async function authMiddleware(req: Request, res: Response, next: Function
 
         const idToken = authHeader.split('Bearer ')[1];
         const decodedToken = await auth.verifyIdToken(idToken);
-        return req.user = decodedToken; //user情報をリクエストに追加
-        next(); 
+        req.user = decodedToken; //user情報をリクエストに追加
+        return next(); 
     } catch (error) {
         console.error('認証エラー:', error);
         return res.status(401).json({ error: '無効な認証トークンです。' });
     }
+}
+
+// 開発環境向けにクロス-オリジンリクエストを許可するミドルウェア
+export async function allowCors(req: Request, res: Response, next: Function) {
+    // ローカルホストの場合全てのポートを許可
+    console.log('allowing cors access');
+    res.header('Access-Control-Allow-Origin', 'http://127.0.0.1:5000');
+    res.header('Access-Control-Allow-Methods', '*');
+    res.header('Access-Control-Allow-Headers', '*');
+    
+    return next();
 }
 
 // function signup(req: Request, res: Response) {

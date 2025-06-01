@@ -40,6 +40,8 @@ export default class SettingScene extends SceneBase {
     }
 
     async load(): Promise<void> {
+        this.setting = await userDataManager.getUserSetting();
+        
         // シーンの表示前に初期化済みであることを確かめておく
         if (this.initialized) return;
         await new Promise<void>(
@@ -52,13 +54,15 @@ export default class SettingScene extends SceneBase {
     makeComponent(): JSXElement {
         return <Background>
             <Header onClose={() => this.manager.changeSceneTo(SceneSig.selection)} />
-            <Body eventListeners={{
-                timelimit: (checked) => {
-                    console.log(`制限時間の設定が変更されました: ${checked}`);
-                    this.setting.timeLimitPresentation = checked;
-                    userDataManager.setUserSetting(this.setting);
-                }
-            }}/>
+            <Body 
+                eventListeners={{
+                    timelimit: (checked) => {
+                        this.setting.timeLimitPresentation = checked;
+                        userDataManager.setUserSetting(this.setting);
+                    }
+                }}
+                initialSetting={this.setting}
+            />
         </Background>
     }
 }
@@ -132,14 +136,18 @@ function Body(props: {
         bgm?: (checked: boolean) => void,
         sfx?: (checked: boolean) => void,
         typingSound?: (checked: boolean) => void,
-    }
+    },
+    initialSetting: UserSetting
 }) {
     return <div class='content-area' style={{
         'flex-basis': '0',
         'flex-grow': '1',
     }}>
         <ul style={{"list-style": 'none'}}>
-            <ListEntry onChange={props.eventListeners.timelimit}>制限時間</ListEntry>
+            <ListEntry 
+                onChange={props.eventListeners.timelimit}
+                initialState={props.initialSetting.timeLimitPresentation}
+            >制限時間</ListEntry>
             {/* <ListEntry>BGM</ListEntry>
             <ListEntry>効果音</ListEntry>
             <ListEntry>タイピング音</ListEntry> */}
@@ -147,7 +155,7 @@ function Body(props: {
     </div>
 }
 
-function ListEntry(props: {children: JSXElement, onChange?: (checked: boolean) => void}) {
+function ListEntry(props: {children: JSXElement, initialState: boolean, onChange?: (checked: boolean) => void}) {
     return <li style={{'font-size': '2em'}}>
         <label>
             <input 
@@ -161,6 +169,7 @@ function ListEntry(props: {children: JSXElement, onChange?: (checked: boolean) =
                         height: '1.5em',
                     }
                 }
+                checked={props.initialState}
             />
             {props.children}
         </label>

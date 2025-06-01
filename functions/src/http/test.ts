@@ -7,6 +7,7 @@ import { getAuth } from 'firebase-admin/auth';
 const auth = getAuth(app);
 
 function test(req: Request, res: Response) {
+    console.log('test endpoint called');
     auth.verifyIdToken(req.headers["authorization"]?.split(" ")[1] || "")
     .then((decodedToken) => {
         res.json({message: "ok", user: decodedToken });

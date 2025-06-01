@@ -13,6 +13,7 @@ const db = getFirestore(app);
 
 
 async function getUserData(req: Request, res: Response) {
+    console.log('getUserData called');
     try {
         const userId = req.user?.uid;
         if (!userId) {
@@ -44,6 +45,7 @@ async function getUserData(req: Request, res: Response) {
 }
 
 async function setUserData(req: Request, res: Response) {
+    console.log('setUserData called');
     try {
         const userId = req.user?.uid;
         if (!userId) {
@@ -72,6 +74,7 @@ async function setUserData(req: Request, res: Response) {
 }
 
 async function addGameRecord(req: Request, res: Response) {
+    console.log('addGameRecord called');
     try {
         const userId = req.user?.uid;
         if (!userId) {
@@ -120,6 +123,7 @@ async function addGameRecord(req: Request, res: Response) {
 }
 
 async function getLatestGameRecords(req: Request, res: Response) {
+    console.log('getLatestGameRecords called');
     try {
         const userId = req.user?.uid;
         if (!userId) {
