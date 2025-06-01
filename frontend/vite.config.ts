@@ -4,6 +4,7 @@ import solid from 'vite-plugin-solid'
 export default defineConfig({
   plugins: [solid()],
   build: {
+    sourcemap: true,
     outDir: "../public",
     emptyOutDir: true,
     rollupOptions: {

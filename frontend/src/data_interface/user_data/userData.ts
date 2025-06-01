@@ -102,7 +102,8 @@ export default class UserDataManager implements IUserDataManager {
             const token = await this.getAuthToken();
             if (!token) throw new Error('認証トークンの取得に失敗しました');
 
-            const response = await fetch(new URL('/api/user', Host.functions).toString(), {
+            const response = await fetch(
+                `${Host.functions.href}/api/user`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -143,17 +144,18 @@ export default class UserDataManager implements IUserDataManager {
 
     // ユーザー設定を保存
     async setUserSetting(setting: UserSetting): Promise<void> {
-        // ログインしていない場合は保存しない
-        if (!this.userState.isLoggedIn) {
-            this.userSetting = setting; // ローカルには保存
-            return;
-        }
+        // ログイン状態にかかわらず，ローカルにはキャッシュする
+        this.userSetting = setting;
+
+        // ログインしていない場合はサーバにアクセスしない
+        if (!this.userState.isLoggedIn) return;
 
         try {
             const token = await this.getAuthToken();
             if (!token) throw new Error('認証トークンの取得に失敗しました');
 
-            const response = await fetch(new URL('/api/user', Host.functions).toString(), {
+            const response = await fetch(
+                `${Host.functions.href}/api/user`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -165,9 +167,6 @@ export default class UserDataManager implements IUserDataManager {
             if (!response.ok) {
                 throw new Error('ユーザー設定の保存に失敗しました');
             }
-
-            // キャッシュを更新
-            this.userSetting = setting;
         } catch (error) {
             console.error('設定保存エラー:', error);
         }
@@ -192,7 +191,8 @@ export default class UserDataManager implements IUserDataManager {
             const token = await this.getAuthToken();
             if (!token) throw new Error('認証トークンの取得に失敗しました');
 
-            const response = await fetch(new URL('/api/user', Host.functions).toString(), {
+            const response = await fetch(
+                `${Host.functions.href}/api/user`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -254,7 +254,8 @@ export default class UserDataManager implements IUserDataManager {
                 recordedAt: new Date().toISOString()
             };
 
-            const response = await fetch(new URL('/api/recordss', Host.functions).toString(), {
+            const response = await fetch(
+                `${Host.functions.href}/api/records`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -288,7 +289,8 @@ export default class UserDataManager implements IUserDataManager {
             const token = await this.getAuthToken();
             if (!token) throw new Error('認証トークンの取得に失敗しました');
 
-            const response = await fetch(new URL('/api/records/latest', Host.functions).toString(), {
+            const response = await fetch(
+                `${Host.functions.href}/api/records/latest`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

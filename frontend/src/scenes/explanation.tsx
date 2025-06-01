@@ -98,7 +98,13 @@ export default class ExplanationScene extends SceneBase {
     //
 
     makeComponent(): JSXElement {
-        return <>
+        return <div style={
+            {
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+            }
+        }>
         <div style={{
             "width": '100%',
             "height": '100%',
@@ -113,49 +119,49 @@ export default class ExplanationScene extends SceneBase {
         }}>
         </div>
         <div style={{
-            "width": '70vw',
-            "height":'18vh',
+            "width": '70%',
+            "height":'18%',
             "background-color":'#ECEBEE',
             "position":'absolute',
-            "top":'19vh',
-            "left":'20vw',
+            "top":'19%',
+            "left":'20%',
             "font-size": '5vh',
             "font-weight": 'bold',
             "display": 'flex',
             "align-items": 'center', /* 縦方向中央揃え */
-            "padding-left":'3vw',
+            "padding-left":'3%',
             "color":'black' //上の四角
             }}>
           表示されるコードをタイピングしましょう。  
         </div>
         <div style={{
-            "width":'70vw',
-            "height":'18vh',
+            "width":'70%',
+            "height":'18%',
             "background-color":'#ECEBEE',
             "position":'absolute',
-            "top":'46vh',
-            "left":'20vw',
+            "top":'46%',
+            "left":'20%',
             "font-size": '5vh',
             "font-weight": 'bold',
             "display": 'flex',
             "align-items": 'center', /* 縦方向中央揃え */
-            "padding-left":'3vw',
+            "padding-left":'3%',
             "color":'black'  //真ん中の四角
         }}>
             1つのコード当たりの制限時間は秒です。
         </div>
         <div style={{
-            "width": '70vw',
-            "height":'18vh',
+            "width": '70%',
+            "height":'18%',
             "background-color":'#ECEBEE',
             "position":'absolute',
-            "top":'73vh',
-            "left":'20vw',
+            "top":'73%',
+            "left":'20%',
             "font-size": '5vh',
             "font-weight": 'bold',
             "display": 'flex',
             "align-items": 'center', /* 縦方向中央揃え */
-            "padding-left":'3vw',
+            "padding-left":'3%',
             "color":'black'  //下の四角
         }}>
              コードをタイピングできた数に応じてメーターが上がります。
@@ -165,8 +171,8 @@ export default class ExplanationScene extends SceneBase {
             "height": '22vh',
             "background-color":'#4F97FC',
             "position":'absolute',
-            "top":'17vh',
-            "left":'5vw',
+            "top":'17%',
+            "left":'5%',
             "border-radius":'50%',
             "font-size": '5vh',
             "font-weight": 'bold',
@@ -182,8 +188,8 @@ export default class ExplanationScene extends SceneBase {
             "height": '22vh',
             "background-color":'#4F97FC',
             "position":'absolute',
-            "top":'44vh',
-            "left":'5vw',
+            "top":'44%',
+            "left":'5%',
             "border-radius":'50%',
             "font-size": '5vh',
             "font-weight": 'bold',
@@ -199,8 +205,8 @@ export default class ExplanationScene extends SceneBase {
             "height": '22vh',
             "background-color":'#4F97FC',
             "position":'absolute',
-            "top":'71vh',
-            "left":'5vw',
+            "top":'71%',
+            "left":'5%',
             "border-radius":'50%',
             "font-size": '5vh',
             "font-weight": 'bold',
@@ -230,13 +236,13 @@ export default class ExplanationScene extends SceneBase {
        
         <button style={{
             "position":'absolute',
-            "top":'1vh',
-            "left":'85vw',
-            "width":'13vw',
-            "height":'9vh',
+            "top":'1%',
+            "left":'85%',
+            "width":'13%',
+            "height":'9%',
             "font-size":'4vh',
             "font-weight":'bold',
-            "background-color":'f8f8ff',
+            "background-color":'#f8f8ff',
             "color":'black',
             "border":'none',
             "border-radius":'1vh',
@@ -245,6 +251,7 @@ export default class ExplanationScene extends SceneBase {
             "justify-content": 'center',
             "display": 'flex',
             "align-items": 'center',
+            "padding": '0',
         }}
         onClick={() => {
             this.manager.changeSceneTo(SceneSig.selection);
@@ -252,6 +259,6 @@ export default class ExplanationScene extends SceneBase {
     >
         閉じる
     </button>
-        </>
+        </div>
     }
 }

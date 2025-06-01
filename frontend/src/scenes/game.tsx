@@ -4,7 +4,7 @@ import type SceneManager from "./fundation/sceneManager";
 import { Container, Application as PixiApp, Text, TextStyle, Graphics } from 'pixi.js'
 import SceneSig from "./fundation/signatures";
 import styles from "./game.module.css";
-import { type GameStats } from "../data_interface/user_data/types";
+import { type GameStats, type UserSetting } from "../data_interface/user_data/types";
 import { userDataManager, Host } from "../const.ts";
 import metype from "/images/METYPE.png";
 
@@ -32,6 +32,7 @@ export default class GameScene extends SceneBase {
   }
   private pixiApp!: PixiApp;
   private problemData!: Problem;
+  private gameSetting?: UserSetting;
   /** @deprecated problemDataが現在位置の情報を持つようになったためdeprecated */
   private currentPosition = 0;
   private textContainer!: Container;
@@ -65,14 +66,13 @@ export default class GameScene extends SceneBase {
     await pixiApp.init({ 
       backgroundAlpha: 0 
     })
-
-    await Promise.all([
-      (async () => {
-        // 問題データの読み込み
-        this.problemData = GameDataProvider.getProblem();
-      })(),
-    ]);
     this.pixiApp = pixiApp;
+  }
+
+  async load(): Promise<void> {
+    this.problemData = GameDataProvider.getProblem();
+    this.gameSetting = await userDataManager.getUserSetting();
+    console.log(this.gameSetting);
   }
 
   // ゲーム開始
@@ -85,15 +85,18 @@ export default class GameScene extends SceneBase {
     // タイマー開始
     this.gameTimer = window.setInterval(() => {
       const currentStats = this.stats();
-      if (currentStats.timeRemaining <= 0) {
+      if (
+        // timelimitが有効な場合のみタイマーが0以下になったら終了
+        this.gameSetting?.timeLimitPresentation
+        && currentStats.timeRemaining <= 0
+      ) {
         this.endGame(this.statsSignal[0]());
         return;
       }
       
       this.setStats(prev => ({
         ...prev,
-        // timeRemaining: prev.timeRemaining - 6
-                timeRemaining: prev.timeRemaining 
+        timeRemaining: prev.timeRemaining - 1
       }));
       this.setStats(prev => ({
         ...prev,
@@ -163,11 +166,11 @@ export default class GameScene extends SceneBase {
   private readonly charWidth = 12;
 
   // 文字の表示処理
-  private putCharAt(x: number, y: number, char: string, backgroundColor: number, textColor: number): void {
+  private putCharAt(x: number, y: number, char: string, charWidth: number, backgroundColor: number, textColor: number): void {
     // 背景矩形
     if (backgroundColor !== 0x000000) {
       const bg = new Graphics();
-      bg.rect(x - 2, y - 2, this.charWidth, this.lineHeight);
+      bg.rect(x - 2, y - 2, charWidth, this.lineHeight);
       bg.fill(backgroundColor);
       this.backgroundContainer.addChild(bg);
     }
@@ -215,8 +218,10 @@ export default class GameScene extends SceneBase {
         // 文字の背景色を決定
         const backgroundColor = 0x22C55E; // 緑
         const textColor = 0x000000; // 黒
-        this.putCharAt(currentX, currentY, char, backgroundColor, textColor);
-        currentX += this.charWidth;
+        // マルチバイト文字の場合は幅を2倍にする
+        const width = this.charWidth * (this.isJapanese(char) ? 2 : 1);
+        this.putCharAt(currentX, currentY, char, width, backgroundColor, textColor);
+        currentX += width;
       }
     }
 
@@ -228,8 +233,10 @@ export default class GameScene extends SceneBase {
       const backgroundColor = 0xEAB308; // 黄色
       const textColor = 0xeeeeee; // 灰色
       const currentChar = this.problemData.charAtCursor();
-      this.putCharAt(currentX, currentY, currentChar, backgroundColor, textColor);
-      currentX += this.charWidth;
+      // マルチバイト文字の場合は幅を2倍にする
+      const width = this.charWidth * (this.isJapanese(currentChar) ? 2 : 1);
+      this.putCharAt(currentX, currentY, currentChar, width, backgroundColor, textColor);
+      currentX += width;
     }
 
     for (const token of this.problemData.tokensAfterCursor()) {
@@ -242,8 +249,10 @@ export default class GameScene extends SceneBase {
         }
         const backgroundColor = 0x000000; // 透明
         const textColor = 0xFFFFFF; // 白
-        this.putCharAt(currentX, currentY, char, backgroundColor, textColor);
-        currentX += this.charWidth;
+      // マルチバイト文字の場合は幅を2倍にする
+        const width = this.charWidth * (this.isJapanese(char) ? 2 : 1);
+        this.putCharAt(currentX, currentY, char, width, backgroundColor, textColor);
+        currentX += width;
       }
     }
 
@@ -259,6 +268,12 @@ export default class GameScene extends SceneBase {
     this.textContainer.x = -scrollOffsetX + 20;
     this.backgroundContainer.x = -scrollOffsetX + 20;
 
+  }
+
+  // https://stackoverflow.com/questions/4877326/how-can-i-tell-if-a-string-contains-multibyte-characters-in-javascript
+  private isJapanese(testee: string): boolean {
+    return /[\u3041-\u3096\u30A1-\u30FA]|[ー々〇〻\u3400-\u9FFF\uF900-\uFAFF]|[\uD840-\uD87F][\uDC00-\uDFFF]/
+      .test(testee);
   }
 
 MiddleCanvas(): JSXElement {
