@@ -280,34 +280,39 @@ export default class GameScene extends SceneBase {
       .test(testee);
   }
 
-MiddleCanvas(): JSXElement {
-  let containerDiv!: HTMLDivElement;
+  private keyEventHandler?: (e: KeyboardEvent) => void;
+  MiddleCanvas(): JSXElement {
+    let containerDiv!: HTMLDivElement;
 
-  onMount(() => {
-    if (containerDiv && this.pixiApp.canvas) {
-      // canvasをappendChild
-      containerDiv.appendChild(this.pixiApp.canvas);
+    onMount(() => {
+      if (containerDiv && this.pixiApp.canvas) {
+        // canvasをappendChild
+        containerDiv.appendChild(this.pixiApp.canvas);
 
-      const pixiContainer = this.makePixiAppContent();
-      this.arrangeContent(pixiContainer, containerDiv);
-
-      window.addEventListener('keydown', (e) => this.handleKeyInput(e));
-
-      this.updateDisplay();
-
-      window.addEventListener('resize', () => {
+        const pixiContainer = this.makePixiAppContent();
         this.arrangeContent(pixiContainer, containerDiv);
-      });
-    }
-  });
 
-  return (
-    <div
-      ref={el => containerDiv = el!}
-      style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden'}}
-    />
-  );
-}
+        if (this.keyEventHandler) {
+          window.removeEventListener('keydown', this.keyEventHandler);
+        }
+        this.keyEventHandler = (e) => this.handleKeyInput(e);
+        window.addEventListener('keydown', this.keyEventHandler);
+
+        this.updateDisplay();
+
+        window.addEventListener('resize', () => {
+          this.arrangeContent(pixiContainer, containerDiv);
+        });
+      }
+    });
+
+    return (
+      <div
+        ref={el => containerDiv = el!}
+        style={{ height: '100%', width: '100%', position: 'relative', overflow: 'hidden'}}
+      />
+    );
+  }
 
   // PixiAppのコンテンツを作成する
   makePixiAppContent(): Container {
