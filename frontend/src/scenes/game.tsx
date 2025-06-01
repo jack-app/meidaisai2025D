@@ -185,12 +185,12 @@ export default class GameScene extends SceneBase {
     // 文字
 
     const style = new TextStyle({
-      fontFamily: 'Consolas',
+      fontFamily: ['Consolas', 'Cascadia Code', 'Monaco', 'Monospace', 'BIZ UDGothic'],
       fontSize: this.fontSize,
       fill: textColor,
     });
 
-    const text = new Text(char, style);
+    const text = new Text({text: char, style});
     text.x = x;
     text.y = y;
     this.textContainer.addChild(text);
