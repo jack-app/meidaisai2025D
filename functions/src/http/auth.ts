@@ -28,11 +28,11 @@ export async function authMiddleware(req: Request, res: Response, next: Function
 // 開発環境向けにクロス-オリジンリクエストを許可するミドルウェア
 export async function allowCors(req: Request, res: Response, next: Function) {
     // ローカルホストの場合全てのポートを許可
-    console.log('allowing cors access');
+    console.log(`allowing cors access. origin: ${req.headers.origin} host: ${req.headers.host}`);
 
     if (
-        req.headers.origin?.includes('127.0.0.1') 
-        || req.headers.origin?.includes('localhost') 
+        req.headers.host?.includes('127.0.0.1') 
+        || req.headers.host?.includes('localhost') 
         || req.headers.origin?.includes('metype-ffe25.web.app') 
         || req.headers.origin?.includes('metype-ffe25.firebaseapp.com')
     ) {

@@ -18,6 +18,19 @@ export default function (app: Express) {
     // // ユーザ認証用エンドポイント
     // app.post("/api/login", login);
 
+    // CORS用にOPTIONSメソッドを用意
+    app.options("/api/user", allowCors, (req, res) => {
+        res.sendStatus(204);
+    });
+    // CORS用にOPTIONSメソッドを用意
+    app.options("/api/records", allowCors, (req, res) => {
+        res.sendStatus(204);
+    });
+    // CORS用にOPTIONSメソッドを用意
+    app.options("/api/records/latest", allowCors, (req, res) => {
+        res.sendStatus(204);
+    });
+
     // ユーザデータ取得用エンドポイント
     app.get("/api/user", allowCors, authMiddleware, getUserData);
 
