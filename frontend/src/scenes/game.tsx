@@ -68,10 +68,10 @@ export default class GameScene extends SceneBase {
     this.statsSignal = createSignal<GameStats>({
       correctTypes: 0,
       mistypes: 0,
-      timeRemaining: 60,
+      timeRemaining: 100,
       correctRate: 0,
       wpm: 0,
-      totalTime: 60
+      totalTime: 100
     });
     this.setGameEnded(false);
     this.setGameStarted(false);
